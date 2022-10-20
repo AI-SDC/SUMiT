@@ -42,7 +42,7 @@ Python library:
 ```
 $ sudo apt install python3 python3-dev cmake
 $ git clone --recurse-submodules https://github.com/AI-SDC/SUMiT.git
-$ cd sumit/build
+$ cd SUMiT/build
 $ cmake -DCMAKE_BUILD_TYPE=Release -DPYLIB=ON ..
 $ make
 ```
@@ -52,7 +52,7 @@ $ make
 ```
 $ brew install cmake python
 $ git clone --recurse-submodules https://github.com/AI-SDC/SUMiT.git
-$ cd sumit/build
+$ cd SUMiT/build
 $ cmake -DCMAKE_BUILD_TYPE=Release -DPYLIB=ON ..
 $ make
 ```
