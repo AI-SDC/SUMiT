@@ -1,0 +1,293 @@
+
+
+
+
+# Environment
+MKDIR=mkdir
+CP=cp
+GREP=grep
+NM=nm
+CCADMIN=CCadmin
+RANLIB=ranlib
+CC=gcc
+CCC=g++
+CXX=g++
+FC=gfortran
+AS=as
+JAVAC=/usr/bin/javac
+
+# Macros
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+DISTDIR=${ROOT_DIR}/dist
+OBJECTDIR=${ROOT_DIR}/build
+BUILDDIR=${ROOT_DIR}/build
+SRC_DIR=${ROOT_DIR}/src
+LIB_SRC_DIR=${ROOT_DIR}/src/sumit_lib 
+LIB_OBJECT_DIR= ${OBJECTDIR}/sumit_lib
+
+SERVER_SRC_DIR=${SRC_DIR}/sumit_server
+SERVER_OBJECT_DIR=${OBJECTDIR}/sumit_server
+
+SOLVER_SRC_DIR=${SRC_DIR}/cellsuppression_solver 
+SOLVER_OBJECT_DIR=${OBJECTDIR}/cellsuppression_solver
+
+CSTOOL_SRC_DIR=${SRC_DIR}/cell_suppression
+CSTOOL_OBJECT_LIB=${OBJECTDIR}/cell_suppression
+
+CLP_SRC_DIR=${ROOT_DIR}/thirdparty/src
+CLP_OBJECT_DIR=${ROOT_DIR}/thirdparty/build
+
+# C Compiler Flags
+CFLAGS=-O3 -Wall -std=c++11 -MMD -MP -MF
+
+# CC Compiler Flags
+CCFLAGS=-Wconversion
+CXXFLAGS=-Wconversion
+
+# Fortran Compiler Flags
+FFLAGS=
+
+# Assembler Flags
+ASFLAGS=
+
+# Link Libraries and Options
+LDLIBSOPTIONS=
+
+#includes
+INCS=
+
+
+# Build Targets
+locations:
+	$(info $$DISTDIR is ${DISTDIR})
+	$(info $$OBJECTDIR is ${OBJECTDIR})
+	$(info $$SRC_DIR is ${SRC_DIR})
+	$(info $$LIB_SRC_DIR is ${LIB_SRC_DIR})
+	$(info $$LIB_OBJECT_DIR is ${LIB_OBJECT_DIR})
+	$(info $$SERVER_SRC_DIR is ${SERVER_SRC_DIR})
+	$(info $$SERVER_OBJECT_DIR is ${SERVER_OBJECT_DIR})
+	$(info $$SOLVER_SRC_DIR is ${SOLVER_SRC_DIR})
+	$(info $$SOLVER_OBJECT_DIR is ${SOLVER_OBJECT_DIR})
+	$(info $$CSTOOL_SRC_DIR is ${CSTOOL_SRC_DIR})
+	$(info $$CSTOOL_OBJECT_LIB is ${CSTOOL_OBJECT_LIB})
+	$(info $$CLP_SRC_DIR is ${CLP_SRC_DIR})
+	$(info $$CLP_OBJ_DIR is ${CLP_OBJECT_DIR})
+
+
+
+
+all: ${DISTDIR}/suppressionsolver \
+	${DISTDIR}/cell_suppression_tool \
+	${DISTDIR}/libuwecellsuppressionlib.a \
+	${DISTDIR}/sumit_server.jar
+     
+
+
+######  main cell suppression optimisation tool   #################
+# one source code file, compiled with the sumit lib
+${DISTDIR}/cell_suppression_tool: ${CSTOOL_OBJECT_LIB}/UWECellSuppression.o  \
+                                  ${DISTDIR}/libuwecellsuppressionlib.a \
+                              
+
+${CSTOOL_OBJECT_LIB}/UWECellSuppression.o: ${CSTOOL_SRC_DIR}/UWECellSuppression.cpp
+	$(COMPILE.cc) -O3 -Wall -std=c++11 -MMD -MP -MF "$@.d" \
+                  -I${CS_SRC_DIR} \
+                  -I${LIB_SRC_DIR} \
+                  -o ${CSTOOL_OBJECT_DIR}/UWECellSuppression.o \
+                  ${CSTOOL_SRC_DIR}/UWECellSuppression.cpp 
+
+
+###### cell suppression solver ####################
+${DISTDIR}/suppressionsolver: ${SOLVER_OBJECT_DIR}/UWESolver.o  \
+                              ${DISTDIR}/libuwecellsuppressionlib.a \
+                              ${DISTDIR}/libClp.a \
+							  ${SOLVER_OBJECT_DIR}/Solver.o \
+							  -L${CLP_LIB_DIR}  ${DIST_DIR}/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp 
+
+
+${SOLVER_OBJECT_DIR}/UWESolver.o: ${SOLVER_SRC_DIR}/UWESolver.cpp 
+#                                  ${SOLVER_OBJECT_DIR}/Solver.o 
+	${MKDIR} -p ${SOLVER_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -I${LIB_SRC_DIR} -I${CLP_SRC_DIR}  \
+                  -std=c++11 -MMD -MP -MF "$@.d" \
+                  -o ${SOLVER_OBJECTDIR}/UWESolver.o \
+                  ${SOLVER_SRC_DIR}/UWESolver.cpp \
+#                  ${SOLVER_OBJECT_DIR}/Solver.o \
+#                  -L${CLP_LIB_DIR}  ${DIST_DIR}/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp 
+
+
+${SOLVER_OBJECT_DIR}/Solver.o:  ${SOLVER_SRC_DIR}/Solver.cpp ${OBJECTDIR}/UWESolver.o
+	${MKDIR} -p ${SOLVER_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -I${LIB_SRC_DIR} -I${CLP_SRC_DIR} \
+                  -std=c++11 -MMD -MP -MF "$@.d"\
+                  -o ${SOLVER_OBJECT_DIR}/Solver.o ${SOLVER_SRC_DIR}/Solver.cpp
+
+#server
+#to-do
+
+############library
+
+# Object Files
+LIBOBJECTFILES= \
+	${LIB_OBJECT_DIR}/CSVWriter.o \
+	${LIB_OBJECT_DIR}/CellStore.o \
+	${LIB_OBJECT_DIR}/Eliminate.o \
+	${LIB_OBJECT_DIR}/Evaluation.o \
+	${LIB_OBJECT_DIR}/EvaluationCache.o \
+	${LIB_OBJECT_DIR}/GAProtection.o \
+	${LIB_OBJECT_DIR}/GroupedGAProtection.o \
+	${LIB_OBJECT_DIR}/Groups.o \
+	${LIB_OBJECT_DIR}/IncrementalGAProtection.o \
+	${LIB_OBJECT_DIR}/JJData.o \
+	${LIB_OBJECT_DIR}/LegacyTabularPartitioning.o \
+	${LIB_OBJECT_DIR}/Logger.o \
+	${LIB_OBJECT_DIR}/NoPartitioning.o \
+	${LIB_OBJECT_DIR}/PartitionData.o \
+	${LIB_OBJECT_DIR}/Partitioning.o \
+	${LIB_OBJECT_DIR}/ProgressLog.o \
+	${LIB_OBJECT_DIR}/SamplesLog.o \
+	${LIB_OBJECT_DIR}/ServerConnection.o \
+	${LIB_OBJECT_DIR}/Solver.o \
+	${LIB_OBJECT_DIR}/System.o \
+	${LIB_OBJECT_DIR}/TabularData.o \
+	${LIB_OBJECT_DIR}/Unpicker.o \
+	${LIB_OBJECT_DIR}/stdafx.o
+
+${DISTDIR}/libuwecellsuppressionlib.a: ${LIBOBJECTFILES}
+	${MKDIR} -p ${DISTDIR}
+	${RM} ${DISTDIR}/libuwecellsuppressionlib.a
+	${AR} -rv ${DISTDIR}/libuwecellsuppressionlib.a $?
+	$(RANLIB) ${DISTDIR}/libuwecellsuppressionlib.a
+	
+	
+$(LIB_OBJECT_DIR)/%.o: $(LIB_SRC_DIR)/%.c 
+    gcc -c -o $@ $(DIRS) $(CFLAGS) $<
+$(OBJECTS): src/%.o : src/%.c
+    $(CC) $(CFLAGS) -c $< $(LIB_PATH) $(LIBS) -o $@
+
+${LIB_OBJECT_DIR}/CSVWriter.o: ${LIB_SRC_DIR}/CSVWriter.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/CSVWriter.o ${LIB_SRC_DIR}/CSVWriter.cpp
+
+${LIB_OBJECT_DIR}/CellStore.o: ${LIB_SRC_DIR}/CellStore.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/CellStore.o ${LIB_SRC_DIR}/CellStore.cpp
+
+${LIB_OBJECT_DIR}/Eliminate.o: ${LIB_SRC_DIR}/Eliminate.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Eliminate.o ${LIB_SRC_DIR}/Eliminate.cpp
+
+${LIB_OBJECT_DIR}/Evaluation.o: ${LIB_SRC_DIR}/Evaluation.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Evaluation.o ${LIB_SRC_DIR}/Evaluation.cpp
+
+${LIB_OBJECT_DIR}/EvaluationCache.o: ${LIB_SRC_DIR}/EvaluationCache.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/EvaluationCache.o ${LIB_SRC_DIR}/EvaluationCache.cpp
+
+${LIB_OBJECT_DIR}/GAProtection.o: ${LIB_SRC_DIR}/GAProtection.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/GAProtection.o ${LIB_SRC_DIR}/GAProtection.cpp
+
+${LIB_OBJECT_DIR}/GroupedGAProtection.o: ${LIB_SRC_DIR}/GroupedGAProtection.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/GroupedGAProtection.o ${LIB_SRC_DIR}/GroupedGAProtection.cpp
+
+${LIB_OBJECT_DIR}/Groups.o: ${LIB_SRC_DIR}/Groups.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Groups.o ${LIB_SRC_DIR}/Groups.cpp
+
+
+${LIB_OBJECT_DIR}/IncrementalGAProtection.o: ${LIB_SRC_DIR}/IncrementalGAProtection.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/IncrementalGAProtection.o ${LIB_SRC_DIR}/IncrementalGAProtection.cpp
+
+${LIB_OBJECT_DIR}/JJData.o: ${LIB_SRC_DIR}/JJData.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/JJData.o ${LIB_SRC_DIR}/JJData.cpp
+
+${LIB_OBJECT_DIR}/LegacyTabularPartitioning.o: ${LIB_SRC_DIR}/LegacyTabularPartitioning.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/LegacyTabularPartitioning.o LegacyTabularPartitioning.cpp
+
+${LIB_OBJECT_DIR}/Logger.o: ${LIB_SRC_DIR}/Logger.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Logger.o ${LIB_SRC_DIR}/Logger.cpp
+
+${LIB_OBJECT_DIR}/NoPartitioning.o: NoPartitioning.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/NoPartitioning.o ${LIB_SRC_DIR}/NoPartitioning.cpp
+
+
+${LIB_OBJECT_DIR}/PartitionData.o: ${LIB_SRC_DIR}/PartitionData.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/PartitionData.o ${LIB_SRC_DIR}/PartitionData.cpp
+
+${LIB_OBJECT_DIR}/Partitioning.o: ${LIB_SRC_DIR}/Partitioning.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Partitioning.o ${LIB_SRC_DIR}/Partitioning.cpp
+
+${LIB_OBJECT_DIR}/ProgressLog.o: ${LIB_SRC_DIR}/ProgressLog.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/ProgressLog.o ${LIB_SRC_DIR}/ProgressLog.cpp
+
+${LIB_OBJECT_DIR}/SamplesLog.o: ${LIB_SRC_DIR}/SamplesLog.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/SamplesLog.o ${LIB_SRC_DIR}/SamplesLog.cpp
+
+${LIB_OBJECT_DIR}/ServerConnection.o: ${LIB_SRC_DIR}/ServerConnection.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/ServerConnection.o ${LIB_SRC_DIR}/ServerConnection.cpp
+
+${LIB_OBJECT_DIR}/Solver.o: ${LIB_SRC_DIR}/Solver.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Solver.o ${LIB_SRC_DIR}/Solver.cpp
+
+${LIB_OBJECT_DIR}/System.o: ${LIB_SRC_DIR}/System.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/System.o ${LIB_SRC_DIR}/System.cpp
+
+${LIB_OBJECT_DIR}/TabularData.o: ${LIB_SRC_DIR}/TabularData.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/TabularData.o ${LIB_SRC_DIR}/TabularData.cpp
+
+${LIB_OBJECT_DIR}/Unpicker.o: ${LIB_SRC_DIR}/Unpicker.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/Unpicker.o ${LIB_SRC_DIR}/Unpicker.cpp
+
+${LIB_OBJECT_DIR}/stdafx.o: ${LIB_SRC_DIR}/stdafx.cpp 
+	${MKDIR} -p ${LIB_OBJECT_DIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -I$(INCS) ${CFLAGS} "$@.d" -o ${LIB_OBJECT_DIR}/stdafx.o ${LIB_SRC_DIR}/stdafx.cpp
+
+
+# Clean Targets
+#clean: 
+#	${RM} ${LIB_OBJECT_DIR}/* ${SOLVER_OBJECT_DIR}/* ${CS_OBJECT_DIR}/*
+#	${RM} ${DISTDIR}/libuwecellsuppressionlib.a
+
+
