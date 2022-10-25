@@ -62,7 +62,7 @@ protected:
     SamplesLog *samples_log;
     struct Individual *pool_parent;
     struct Individual *pool_clones;
-    
+
     int pool_parent_size;
     int pool_clones_size;
     int default_number_of_clones;
@@ -83,15 +83,15 @@ protected:
 
 private:
     char outjjfilename[MAX_FILENAME_SIZE];
-    
+
     char host[MAX_HOST_NAME_SIZE];
     char port[MAX_PORT_NUMBER_SIZE];
     int cores;
-    
+
     bool run_elimination;
 
     time_t start_seconds;
-    
+
     struct Individual *pool_mating;
     struct Individual *pool_offspring;
 
@@ -99,7 +99,7 @@ private:
     int algorithm_for_crossover;
     int algorithm_for_mutation;
     int algorithm_for_replacement;
-    
+
     int number_of_offspring;
     int offspring1;
     int offspring2;
@@ -114,11 +114,11 @@ private:
     int stable_generations;
     int max_seconds;
     bool terminated;
-    
+
     double best_fitness;
-    
+
     EvaluationCache *evaluationCache;
-    
+
     bool invalid_offspring(int offspring);
     void sort_pool_by_fitness(int number_to_sort, struct Individual Pool[]);
     void copy_individual(struct Individual* to, struct Individual* from);
@@ -150,5 +150,5 @@ private:
     void increase_polling_delay(int *delay);
     void write_perm_file(const char* filename, int* perm, int size);
     int read_cost_file(const char* filename, double* costs);
-    
+
 };

@@ -9,7 +9,7 @@ set(LIB_SOURCES
     EvaluationCache.cpp
     GAProtection.cpp
     GroupedGAProtection.cpp
-    Groups.cpp 
+    Groups.cpp
     IncrementalGAProtection.cpp
     JJData.cpp
     LegacyTabularPartitioning.cpp
@@ -17,7 +17,7 @@ set(LIB_SOURCES
     NoPartitioning.cpp
     PartitionData.cpp
     Partitioning.cpp
-    ProgressLog.cpp 
+    ProgressLog.cpp
     SamplesLog.cpp
     ServerConnection.cpp
     Solver.cpp
@@ -39,7 +39,7 @@ set(LIB_HEADERS
     Individual.h
     JJData.h
     LegacyTabularPartitioning.h
-    Logger.h 
+    Logger.h
     MersenneTwister.h
     NoPartitioning.h
     PartitionData.h

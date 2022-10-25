@@ -21,7 +21,7 @@
 
 // Note that PATH_MAX is not guaranteed on Linux and longer paths can be created
 // There is no easy way round this except by creating buffers dynamically
-#define MAX_FILENAME_SIZE PATH_MAX 
+#define MAX_FILENAME_SIZE PATH_MAX
 #define DIRECTORY_SEPARATOR '/'
 
 #define SOCKET int
@@ -62,5 +62,5 @@ private:
     struct timespec req;
     struct timespec rem;
 #endif
-    
+
 };

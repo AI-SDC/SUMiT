@@ -8,7 +8,7 @@
 #include "JJData.h"
 
 class Unpicker {
-    
+
 public:
     Unpicker(const char* injjfilename);
     ~Unpicker(void);

@@ -23,7 +23,7 @@ public class OrphanHandler implements Runnable {
             try {
                 while (true) {
                     sessions.checkForOrphans();
-                    
+
                     Thread.sleep(10000);
                 }
             } catch (InterruptedException e) {

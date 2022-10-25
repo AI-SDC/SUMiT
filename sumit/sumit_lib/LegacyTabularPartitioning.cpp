@@ -44,11 +44,11 @@ LegacyTabularPartitioning::LegacyTabularPartitioning(char* metadataFilename, cha
     int partition_2_index;
 
     logger->log(3, "Legacy tabular partitioning");
-    
+
     tabular = new TabularData(metadataFilename, tabdataFilename);
     logger->log(3, "%d dimensions", tabular->GetNumberOfDimensions());
     logger->log(3, "%d cells", tabular->GetNumberOfCells());
-    
+
     partition_1_index = tabular->GetFieldIndex(partition_by_1);
 
     if (tabular->GetFieldType(partition_by_1) != FIELD_TYPE_RECODEABLE) {
@@ -81,7 +81,7 @@ LegacyTabularPartitioning::LegacyTabularPartitioning(char* metadataFilename, cha
     if (tabular->GetFieldType(partition_by_2) != FIELD_TYPE_RECODEABLE) {
         logger->error(1, "Partitioning parameter (%s) is not a key field", partition_by_2);
     }
-        
+
     logger->log(3, "Partition parameter 2 (%s) has index %d", partition_by_2, partition_2_index);
 
     if (tabular->IsHierarchical(partition_by_2)) {
@@ -109,7 +109,7 @@ LegacyTabularPartitioning::LegacyTabularPartitioning(char* metadataFilename, cha
     tabular->CreatePartitionedMetadataFiles(partition_by_1, number_of_required_partitions(tabular, partition_by_1, partition_by_2), partition_by_2, number_of_required_partitions(tabular, partition_by_2, partition_by_1));
 
     number_of_partitions = number_of_required_partitions(tabular, partition_by_1, partition_by_2) * number_of_required_partitions(tabular, partition_by_2, partition_by_1);
-    
+
     number_of_cells = new int[number_of_partitions];
     number_of_primary_cells = new int[number_of_partitions];
 }
@@ -138,7 +138,7 @@ void LegacyTabularPartitioning::write_partitioned_jj_file(int index, const char*
 
     char partitioned_map_filename[sizeof("Map_XXXXX.txt")];
     sprintf(partitioned_map_filename, "Map_%d.txt", index + 1);
-    
+
     partitioned_tabular->PrintJJFileMapping(partitioned_map_filename);
 
     delete partitioned_tabular;
@@ -149,7 +149,7 @@ int LegacyTabularPartitioning::get_number_of_cells(int index) {
     if (index >= number_of_partitions) {
         logger->error(1, "Partition index out of bounds");
     }
-    
+
     return number_of_cells[index];
 }
 
@@ -159,6 +159,6 @@ int LegacyTabularPartitioning::get_number_of_primary_cells(int index) {
     if (index >= number_of_partitions) {
         logger->error(1, "Partition index out of bounds");
     }
-    
+
     return number_of_primary_cells[index];
 }

@@ -42,4 +42,3 @@ void SamplesLog::log_sample(struct Individual *sample, double fitness, int prote
         fflush(samplesfp);
     }
 }
-

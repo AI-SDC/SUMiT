@@ -132,7 +132,7 @@ void CSVWriter::write_csv_file(const char* mapfilename, const char* csvfilename)
             }
         }
     }
-    
+
     fclose(ifp);
     fclose(ofp);
 }

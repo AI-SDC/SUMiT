@@ -13,7 +13,7 @@ typedef int CellID;
 class JJData {
 
 public:
-    
+
     struct Cell {
         CellID id;
         double nominal_value;
@@ -46,7 +46,7 @@ public:
     ConsistencyEquation* consistency_eqtns;
 
     JJData(const char* filename);
-    
+
     // Create a partitioned JJ file from a parent table and a list of cells
     // This constructor takes care of generating marginals and consistency equations for the partition and removes zero cells
     // partition_cells is the set of parent cells to include in the partition.  Cells may appear in any order.  Any marginals present are ignored.
@@ -62,7 +62,7 @@ public:
     void recombine(const char* filename);
     CellIndex cell_id_to_index(CellID id);
     CellID cell_index_to_id(CellIndex index);
-    
+
 private:
     std::map<CellID, CellIndex> map;
 

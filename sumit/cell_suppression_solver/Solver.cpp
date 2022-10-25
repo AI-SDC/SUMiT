@@ -17,7 +17,7 @@ Solver::Solver(const char *injjfilename, bool group_protection) {
         groups = NULL;
         number_of_groups = jjData->get_number_of_primary_cells();
     }
-    
+
     YminusOffset = 0;
     YplusOffset = jjData->ncells;
 
@@ -35,17 +35,17 @@ Solver::Solver(const char *injjfilename, bool group_protection) {
 
 Solver::~Solver() {
     delete si;
-    
+
     if (groups) {
         delete groups;
     }
-    
+
     delete jjData;
 }
 
 double* Solver::run_individual_protection(const char* perm_filename, int model_type, double max_cost, int* costs_size) {
     CellIndex* ordered_cells = read_permutation_file(perm_filename);
-    
+
     jjData->reset();
 
     allocate_coin_memory();
@@ -54,11 +54,11 @@ double* Solver::run_individual_protection(const char* perm_filename, int model_t
     si->loadProblem(*matrixA, varLB, varUB, objCoeffs, rowLB, rowUB);
     si->setIntParam(OsiMaxNumIteration, 1000000);
     si->initialSolve();
-    
+
     double* costs = new double[number_of_groups];
-    
+
     *costs_size = 0;
-    
+
     for (CellIndex i = 0; i < number_of_groups; i++) {
         CellIndex cell = ordered_cells[i];
 
@@ -74,14 +74,14 @@ double* Solver::run_individual_protection(const char* perm_filename, int model_t
             si->setColBounds(YplusOffset + cell, 0.0, 0.0);
             si->resolve();
             logModel();
-            
+
             for (CellIndex j = 0; j < jjData->ncells; j++) {
                 logger->log(5, "%d %lf %lf", j, si->getColSolution()[YminusOffset + j], si->getColSolution()[YplusOffset + j]);
                 if ((si->getColSolution()[YminusOffset + j] + si->getColSolution()[YplusOffset + j]) > 0.01) {
                     if (jjData->cells[j].status == 's') {
                         logger->log(5, "Suppress secondary cell %d", j);
                         jjData->cells[j].status = 'm';
-                        
+
                          // Set primary cell coefficient to 0
                         si->setObjCoeff(YminusOffset + j, 0.0);
                         si->setObjCoeff(YplusOffset + j, 0.0);
@@ -89,7 +89,7 @@ double* Solver::run_individual_protection(const char* perm_filename, int model_t
                 }
             }
         }
-        
+
         // Y plus
         if ((model_type == FULL_MODEL) || (model_type == YPLUS_MODEL)) {
             logger->log(5, "Solving Y plus for cell %d", cell);
@@ -112,31 +112,31 @@ double* Solver::run_individual_protection(const char* perm_filename, int model_t
                 }
             }
         }
-        
+
         // Reset lower and upper variable bounds
         si->setColBounds(YminusOffset + cell, 0.0, jjData->cells[cell].nominal_value);
         si->setColBounds(YplusOffset + cell, 0.0, jjData->cells[cell].nominal_value);
-        
+
         // Note cost
         costs[i] = get_cost();
         (*costs_size)++;
-        
+
         // Terminate early if cost limit specified and reached
         if ((fabs(max_cost) >= FLOAT_PRECISION) && (costs[i] >= max_cost)) {
             break;
         }
     }
-    
+
     delete[] ordered_cells;
 
     release_coin_memory();
-    
+
     return costs;
 }
 
 double* Solver::run_group_protection(const char* perm_filename, int model_type, double max_cost, int* costs_size) {
     int* ordered_groups = read_permutation_file(perm_filename);
-    
+
     jjData->reset();
 
     allocate_coin_memory();
@@ -149,7 +149,7 @@ double* Solver::run_group_protection(const char* perm_filename, int model_type, 
     double* costs = new double[number_of_groups];
 
     *costs_size = 0;
-    
+
     for (int i = 0; i < number_of_groups; i++) {
         int grp = ordered_groups[i];
 
@@ -208,7 +208,7 @@ double* Solver::run_group_protection(const char* perm_filename, int model_type, 
                     }
                 }
             }
-            
+
             // Reset lower and upper variable bounds
             for (CellIndex j = 0; j < size; j++) {
                 CellIndex cell = groups->group[grp].cell_index[j];
@@ -216,21 +216,21 @@ double* Solver::run_group_protection(const char* perm_filename, int model_type, 
                 si->setColBounds(YplusOffset + cell, 0.0, jjData->cells[cell].nominal_value);
             }
         }
-        
+
         // Note cost
         costs[i] = get_cost();
         (*costs_size)++;
-        
+
         // Terminate early if cost limit specified and reached
         if ((fabs(max_cost) >= FLOAT_PRECISION) && (costs[i] >= max_cost)) {
             break;
         }
     }
-    
+
     delete[] ordered_groups;
 
     release_coin_memory();
-    
+
     return costs;
 }
 
@@ -245,13 +245,13 @@ double Solver::get_cost() {
             cost = cost + jjData->cells[i].loss_of_information_weight;
         }
     }
-    
+
     return cost;
 }
 
 int* Solver::read_permutation_file(const char* filename) {
     FILE *ifp;
-    
+
     if ((ifp = fopen(filename, "r")) == NULL) {
         logger->error(303, "Permutation file not found: %s", filename);
     }
@@ -274,7 +274,7 @@ int* Solver::read_permutation_file(const char* filename) {
 
     // Read the permutation
     rewind(ifp);
-    
+
     int* permutation = new int[size];
 
     int line = 0;
@@ -282,12 +282,12 @@ int* Solver::read_permutation_file(const char* filename) {
         if (fscanf(ifp, "%d\n",  &permutation[i]) != 1) {
             logger->error(305, "Error reading permutation file at line %d: %s", line, filename);
         }
-        
+
         line++;
     }
 
     fclose(ifp);
-    
+
     return permutation;
 }
 
@@ -370,13 +370,13 @@ void Solver::allocate_coin_memory() {
         rowLB[i] = jjData->consistency_eqtns[i].RHS;
         rowUB[i] = jjData->consistency_eqtns[i].RHS;
     }
-    
+
     if (element != number_of_elements) {
         logger->error(301, "Incorrect number of elements in Coin Packed Matrix");
     }
 
     logger->log(5, "Coin Packed Matrix contains %d elements", number_of_elements);
-    
+
     matrixA = new CoinPackedMatrix(ROW_ORDERED, row_indices, col_indices, elements, element);
 }
 

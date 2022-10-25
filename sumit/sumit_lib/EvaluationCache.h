@@ -13,7 +13,7 @@ class EvaluationCache {
 public:
     EvaluationCache(int chromosome_size);
     ~EvaluationCache();
-    
+
     bool cached(const CellIndex *genes, int model_type);
     char *jjFile(const CellIndex *genes, int model_type);
     int costs(const CellIndex *genes, int model_type, double **costs);
@@ -27,7 +27,7 @@ public:
     int misses[NUMBER_OF_MODELS];
 
 private:
-    
+
     struct Result {
         char *jj_file;
         int number_of_costs;
@@ -43,7 +43,7 @@ private:
             } else if (eval1.model_type > eval2.model_type) {
                 return false;
             }
-            
+
             // Code assumes that genomes of eval1 and eval2 are the same size
             for (CellIndex i = 0; i < eval1.genome_size; i++) {
                 if (eval1.genes[i] < eval2.genes[i]) {
@@ -59,7 +59,7 @@ private:
 
     int genome_size;
     std::map<Evaluation, struct Result, cmp> map;
-    
+
     void remove(struct Result result);
-    
+
 };

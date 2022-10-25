@@ -8,7 +8,7 @@ JJData::JJData(const char* filename) {
     FILE *ifp;
     int file_id;
     char divider;
-    
+
     name = new char[strlen(filename) + 1];
     strcpy(name, filename);
 
@@ -21,7 +21,7 @@ JJData::JJData(const char* filename) {
     }
 
     // Line 1 - file type
-    line_number++;    
+    line_number++;
     if (fscanf(ifp, "%d\n", &file_id) != 1) {
         logger->error(202, "Incorrect format at line %d: %s", line_number, filename);
     }
@@ -31,7 +31,7 @@ JJData::JJData(const char* filename) {
     }
 
     // Line 2 - number of cells
-    line_number++;    
+    line_number++;
     if (fscanf(ifp, "%d\n", &ncells) != 1) {
         logger->error(204, "Incorrect format at line %d: %s", line_number, filename);
     }
@@ -53,14 +53,14 @@ JJData::JJData(const char* filename) {
                 &cells[i].sliding_protection_level) != 9) {
             logger->error(205, "Incorrect format at line %d: %s", line_number, filename);
         }
-        
+
         cells[i].level = 0;
         map[cells[i].id] = i;
-        
+
         if (cells[i].nominal_value < FLOAT_PRECISION) {
             cells[i].status = 'z';
         }
-        
+
         if (cells[i].status == 'z') {
             nprotected++;
         }
@@ -77,24 +77,24 @@ JJData::JJData(const char* filename) {
 
     // Consistency equations
     consistency_eqtns = new ConsistencyEquation[nsums];
-    
+
     int start_of_constraints = line_number;
 
     for (SumIndex i = 0; i < nsums; i++) {
         line_number++;
-        
+
         if (fscanf(ifp, "%lf ", &consistency_eqtns[i].RHS) != 1) {
             logger->error(209, "Incorrect total format at line %d: %s", line_number, filename);
         }
-        
+
         if (fscanf(ifp, " %d ", &consistency_eqtns[i].size_of_eqtn) != 1) {
             logger->error(210, "Incorrect equation size format at line %d: %s", line_number, filename);
         }
-        
+
         if (consistency_eqtns[i].size_of_eqtn < 2) {
             logger->error(211, "Equation size too small at line %d: %s", line_number, filename);
         }
-        
+
         if ((fscanf(ifp, " %c ", &divider) != 1) || (divider != ':')) {
             logger->error(212, "Incorrect divider format at line %d: %s", line_number, filename);
         }
@@ -109,7 +109,7 @@ JJData::JJData(const char* filename) {
                 logger->error(213, "Incorrect consistency equation format at line %d: %s", line_number, filename);
             }
             consistency_eqtns[i].cell_index[j] = cell_id_to_index(id);
-            
+
             if (consistency_eqtns[i].plus_or_minus[j] < 0) {
                 if (consistency_eqtns[i].marginal_index == -1) {
                     consistency_eqtns[i].marginal_index = consistency_eqtns[i].cell_index[j];
@@ -118,7 +118,7 @@ JJData::JJData(const char* filename) {
                 }
             }
         }
-        
+
         if (consistency_eqtns[i].marginal_index == -1) {
             logger->error(223, "Missing total in consistency equation at line %d: %s", line_number, filename);
         }
@@ -128,12 +128,12 @@ JJData::JJData(const char* filename) {
 
     line_number = start_of_constraints;
     bool error = false;
-    
+
     for (SumIndex i = 0; i < nsums; i++) {
         line_number++;
 
         CellIndex size = consistency_eqtns[i].size_of_eqtn;
-        
+
         if (size > max_eqn_size) {
             max_eqn_size = size;
         }
@@ -152,17 +152,17 @@ JJData::JJData(const char* filename) {
             error = true;
         }
     }
-    
+
     if (error) {
         logger->error(214, "JJ file contains one or more inconsistent constraints: %s", filename);
     }
 
     // Infer levels
     bool changed;
-    
+
     do {
         changed = false;
-        
+
         for (SumIndex i = 0; i < nsums; i++) {
             ConsistencyEquation* eqtn = &consistency_eqtns[i];
             CellIndex marginal_index = cell_id_to_index(find_marginal_id(eqtn));
@@ -185,14 +185,14 @@ JJData::JJData(const char* filename) {
             }
         }
     } while (changed);
-    
+
     nlevels = 0;
     for (CellIndex i = 0; i < ncells; i++) {
         if (cells[i].level > nlevels) {
             nlevels = cells[i].level;
         }
     }
-    
+
     if (ncells > 0) {
         nlevels++;
     }
@@ -227,11 +227,11 @@ JJData::JJData(JJData* parent, CellID* partition_cells, int partition_size, int 
     for (CellIndex i = 0; i < parent->ncells; i++) {
         values[i] = 0.0;
     }
-    
+
     // Initialise the set of cells in the partition
     for (int i = 0; i < partition_size; i++) {
         CellIndex parent_index = parent->cell_id_to_index(partition_cells[i]);
-        
+
         // Ignore any marginals supplied - we will include any required marginals later on
         // Also ignore protected cells (including those with value zero) as these cannot contribute to cell suppression
         if ((parent->cells[parent_index].level == 0) && (parent->cells[parent_index].status != 'z')) {
@@ -239,15 +239,15 @@ JJData::JJData(JJData* parent, CellID* partition_cells, int partition_size, int 
             values[parent_index] = parent->cells[parent_index].nominal_value;
         }
     }
-    
+
     // Iterate through the hierarchy recalculating marginals
     for (int level = 1; level < parent->nlevels; level++) {
         logger->log(5, "Level %d", level);
-        
+
         // Add the direct marginals of the current level to the set of required cells
         for (SumIndex i = 0; i < parent->nsums; i++) {
             ConsistencyEquation* parent_eqtn = &parent->consistency_eqtns[i];
-            
+
             // Only look at marginals for the current level
             if (parent->cells[parent_eqtn->marginal_index].level == level) {
 //                CellID marginal_id = parent->cell_index_to_id(parent_eqtn->marginal_index);
@@ -270,9 +270,9 @@ JJData::JJData(JJData* parent, CellID* partition_cells, int partition_size, int 
                         } else if (TRACE(marginal_id)) {
 //                            logger->log(5, "Marginal %d: Skipping cell %d, level %d, value %lf, parent value %lf", marginal_id, parent->cell_index_to_id(parent_index), parent->cells[parent_index].level, values[parent_index], parent->cells[parent_index].nominal_value);
                         }
-                    } 
+                    }
                 }
-                
+
                 // Add the marginal to the set of required cells if it has not already been added and it is non-zero (i.e., required)
                 if ((values[parent_eqtn->marginal_index] < FLOAT_PRECISION) && (value >= FLOAT_PRECISION)) {
                     values[parent_eqtn->marginal_index] = value;
@@ -295,15 +295,15 @@ JJData::JJData(JJData* parent, CellID* partition_cells, int partition_size, int 
     for (CellIndex i = 0; i < parent->ncells; i++) {
         if ((values[i] >= FLOAT_PRECISION)) {
             ncells++;
-            
+
             if (values[i] > max_value) {
                 max_value = values[i];
             }
         }
     }
-    
+
     cells = new Cell[ncells];
-    
+
     // Generate the permanent data structure for the required cells
     CellIndex j = 0;
     for (CellIndex i = 0; i < parent->ncells; i++) {
@@ -317,7 +317,7 @@ JJData::JJData(JJData* parent, CellID* partition_cells, int partition_size, int 
             j++;
         }
     }
-    
+
     delete[] values;
 
     // Determine the number of consistency equations in the partition
@@ -367,7 +367,7 @@ JJData::~JJData() {
 
         delete[] consistency_eqtns;
     }
-    
+
     delete[] name;
 }
 
@@ -415,31 +415,31 @@ CellIndex JJData::get_number_of_cells() {
 
 CellIndex JJData::get_number_of_primary_cells() {
     CellIndex count = 0;
-            
+
     for (CellIndex i = 0; i < ncells; i++) {
         if (cells[i].status == 'u') {
             count++;
         }
     }
-    
+
     return count;
 }
 
 void JJData::recombine(const char* partitioned_jj_filename) {
     JJData* partition = new JJData(partitioned_jj_filename);
-    
+
     for (CellIndex i = 0; i < partition->ncells; i++) {
         CellID id = partition->cells[i].id;
 
         if (id >= ncells) {
             logger->error(217, "Cell ID %d out of range for recombination: %s", id, partitioned_jj_filename);
         }
-        
+
         if (partition->cells[cell_id_to_index(i)].status == 'm') {
             cells[id].status = 'm';
         }
     }
-    
+
     delete partition;
 }
 
@@ -452,7 +452,7 @@ bool JJData::generate_partition_consistency_equation(JJData* parent, SumIndex in
 
     CellID* cell_id = new CellID[parent_eqtn->size_of_eqtn];
     int* plus_or_minus = new int[parent_eqtn->size_of_eqtn];
-    
+
     partition_equation->size_of_eqtn = 0;
     for (CellIndex i = 0; i < parent_eqtn->size_of_eqtn; i++) {
         // Include the term if the cell is present in the partition
@@ -463,7 +463,7 @@ bool JJData::generate_partition_consistency_equation(JJData* parent, SumIndex in
             partition_equation->size_of_eqtn++;
         }
     }
-    
+
     // Resize arrays to number of cells in the new consistency equation
     if (partition_equation->size_of_eqtn > 1) {
         partition_equation->cell_index = new CellIndex[partition_equation->size_of_eqtn];
@@ -474,10 +474,10 @@ bool JJData::generate_partition_consistency_equation(JJData* parent, SumIndex in
             partition_equation->plus_or_minus[i] = plus_or_minus[i];
         }
     }
-    
+
     delete[] cell_id;
     delete[] plus_or_minus;
-    
+
     if (partition_equation->size_of_eqtn > 1) {
         return true;
     } else {
@@ -505,34 +505,34 @@ CellID JJData::cell_index_to_id(CellIndex index) {
 
 CellID JJData::find_marginal_id(ConsistencyEquation* equation) {
     CellIndex marginal_index_in_eqtn = -1;
-    
+
     for (CellIndex i = 0; i < equation->size_of_eqtn; i++) {
         if (equation->plus_or_minus[i] < 0) {
             marginal_index_in_eqtn = i;
             break;
         }
     }
-    
+
     if (marginal_index_in_eqtn == -1) {
         logger->error(220, "Missing marginal in consistency equation: %s", name);
     }
-    
+
     return cells[equation->cell_index[marginal_index_in_eqtn]].id;
 }
 
 CellIndex JJData::find_marginal_index_in_equation(ConsistencyEquation* equation) {
     CellIndex marginal_index_in_eqtn = -1;
-    
+
     for (CellIndex i = 0; i < equation->size_of_eqtn; i++) {
         if (equation->plus_or_minus[i] < 0) {
             marginal_index_in_eqtn = i;
             break;
         }
     }
-    
+
     if (marginal_index_in_eqtn == -1) {
         logger->error(221, "Missing marginal in consistency equation: %s", name);
     }
-    
+
     return marginal_index_in_eqtn;
 }

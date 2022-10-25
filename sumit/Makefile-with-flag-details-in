@@ -21,7 +21,7 @@ JAVAC=/usr/bin/javac
 #define the end products
 lib_sumit    := bin/libsumit.a
 lib_clp      := bin/libclp
-libraries    := $(lib_sumit) $(lib_clp) 
+libraries    := $(lib_sumit) $(lib_clp)
 cs_tool      := bin/cell_suppression_tool
 cs_solver    := bin/cs_solver
 sumit_server := bin/sumit_server.jar
@@ -47,13 +47,13 @@ DISTDIR=${ROOT_DIR}/dist
 OBJECTDIR=${ROOT_DIR}/build
 BUILDDIR=${ROOT_DIR}/build
 SRC_DIR=${ROOT_DIR}/src
-LIB_SRC_DIR=${ROOT_DIR}/src/sumit_lib 
+LIB_SRC_DIR=${ROOT_DIR}/src/sumit_lib
 LIB_OBJECT_DIR= ${OBJECTDIR}/sumit_lib
 
 SERVER_SRC_DIR=${SRC_DIR}/sumit_server
 SERVER_OBJECT_DIR=${OBJECTDIR}/sumit_server
 
-SOLVER_SRC_DIR=${SRC_DIR}/cellsuppression_solver 
+SOLVER_SRC_DIR=${SRC_DIR}/cellsuppression_solver
 SOLVER_OBJECT_DIR=${OBJECTDIR}/cellsuppression_solver
 
 CSTOOL_SRC_DIR=${SRC_DIR}/cell_suppression
@@ -106,7 +106,7 @@ all: suppressionsolver \
 	cell_suppression_tool \
 	libuwecellsuppressionlib.a \
 	sumit_server.jar
-     
+
 
 
 ######  main cell suppression optimisation tool   #################
@@ -117,7 +117,7 @@ cell_suppression_tool: ${CSTOOL_OBJECT_LIB}/UWECellSuppression.o  \
                   -I${CS_SRC_DIR} \
                   -I${LIB_SRC_DIR} \
                   -o ${DISTDIR}/cellsuppression_tool \
-				  ${CSTOOL_OBJECT_LIB}/UWECellSuppression.o 
+				  ${CSTOOL_OBJECT_LIB}/UWECellSuppression.o
 				  -l${DISTDIR}/libuwecellsuppressionlib.a
 
 ${CSTOOL_OBJECT_LIB}/UWECellSuppression.o: ${CSTOOL_SRC_DIR}/UWECellSuppression.cpp
@@ -125,7 +125,7 @@ ${CSTOOL_OBJECT_LIB}/UWECellSuppression.o: ${CSTOOL_SRC_DIR}/UWECellSuppression.
                   -I${CS_SRC_DIR} \
                   -I${LIB_SRC_DIR} \
                   -o ${CSTOOL_OBJECT_DIR}/UWECellSuppression.o \
-                  ${CSTOOL_SRC_DIR}/UWECellSuppression.cpp 
+                  ${CSTOOL_SRC_DIR}/UWECellSuppression.cpp
 
 
 ###### cell suppression solver ####################
@@ -133,11 +133,11 @@ ${DISTDIR}/suppressionsolver: ${SOLVER_OBJECT_DIR}/UWESolver.o  \
                               ${DISTDIR}/libuwecellsuppressionlib.a \
                               ${DISTDIR}/libClp.a \
 							  ${SOLVER_OBJECT_DIR}/Solver.o \
-							  -L${CLP_LIB_DIR}  ${DIST_DIR}/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp 
+							  -L${CLP_LIB_DIR}  ${DIST_DIR}/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp
 
 
-${SOLVER_OBJECT_DIR}/UWESolver.o: ${SOLVER_SRC_DIR}/UWESolver.cpp 
-#                                  ${SOLVER_OBJECT_DIR}/Solver.o 
+${SOLVER_OBJECT_DIR}/UWESolver.o: ${SOLVER_SRC_DIR}/UWESolver.cpp
+#                                  ${SOLVER_OBJECT_DIR}/Solver.o
 	${MKDIR} -p ${SOLVER_OBJECT_DIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -I${LIB_SRC_DIR} -I${CLP_SRC_DIR}  \
@@ -145,7 +145,7 @@ ${SOLVER_OBJECT_DIR}/UWESolver.o: ${SOLVER_SRC_DIR}/UWESolver.cpp
                   -o ${SOLVER_OBJECTDIR}/UWESolver.o \
                   ${SOLVER_SRC_DIR}/UWESolver.cpp \
 #                  ${SOLVER_OBJECT_DIR}/Solver.o \
-#                  -L${CLP_LIB_DIR}  ${DIST_DIR}/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp 
+#                  -L${CLP_LIB_DIR}  ${DIST_DIR}/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp
 
 
 ${SOLVER_OBJECT_DIR}/Solver.o:  ${SOLVER_SRC_DIR}/Solver.cpp ${OBJECTDIR}/UWESolver.o
@@ -191,7 +191,7 @@ ${DISTDIR}/libuwecellsuppressionlib.a: ${LIBOBJECTFILES}
 	${RM} ${DISTDIR}/libuwecellsuppressionlib.a
 	${AR} -rv ${DISTDIR}/libuwecellsuppressionlib.a $?
 	$(RANLIB) ${DISTDIR}/libuwecellsuppressionlib.a
-	
+
 
 ${LIB_OBJECT_DIR}/%.o: ${LIB_SRC_DIR}/%.c
 	$(info $$@ is $@)
@@ -201,8 +201,6 @@ ${LIB_OBJECT_DIR}/%.o: ${LIB_SRC_DIR}/%.c
 
 
 # Clean Targets
-#clean: 
+#clean:
 #	${RM} ${LIB_OBJECT_DIR}/* ${SOLVER_OBJECT_DIR}/* ${CS_OBJECT_DIR}/*
 #	${RM} ${DISTDIR}/libuwecellsuppressionlib.a
-
-

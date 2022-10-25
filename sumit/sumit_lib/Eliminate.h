@@ -9,16 +9,16 @@
 #define UNPICKING_PRECISION 10
 
 class Eliminate {
-    
+
 public:
     Eliminate(const char* injjfilename);
     ~Eliminate(void);
     void WriteJJFile(const char* outfilename);
     void RemoveExcessSuppression();
     double getCost();
-    
+
 private:
-    // Some fields are not used in elimination and have been commented out to reduce memory usage        
+    // Some fields are not used in elimination and have been commented out to reduce memory usage
     struct Cell {
 //        CellID id;
         int_fast64_t nominal_value;
@@ -31,26 +31,26 @@ private:
 //        int_fast64_t sliding_protection_level;
         bool removable;
     };
-    
+
     struct ConsistencyEquation {
         int_fast64_t RHS;
         CellIndex size_of_eqtn;
         CellIndex *cell_index;
         int *plus_or_minus;
     };
-    
+
     struct CellBounds {
         int_fast64_t lower;
         int_fast64_t upper;
     };
-    
+
     struct ConsolidatedEquation {
         int_fast64_t RHS;
         int size_of_eqtn;
         int *cell_number;
         int *plus_or_minus;
     };
-    
+
     struct ProcessingEquation {
         int cellnumber;
         int_fast64_t RHS;
@@ -63,36 +63,36 @@ private:
         int no_upper_subs;
         int *cells_upper_to_sub;
     };
-    
+
     Cell *cells;
     ConsistencyEquation *consistency_eqtns;
     CellIndex *primaryCells;
-    
+
     int_fast64_t grand_total;
 
     int no_consolidated_eqtns,num_BackupConsolidatedEquations;
     int no_processing_eqtns;
     int nPrimaryCells;
-    
+
     struct CellBounds* cell_bounds, *savedCellBounds;
-    
+
     struct ConsolidatedEquation *consolidated_eqtns, *saved_consolidated_equations;
     struct ProcessingEquation *processing_eqtns_lower;
     struct ProcessingEquation *processing_eqtns_upper;
     int biggestConsEqn;
-    
+
     int initial_nsup_found_1;
     int initial_nsup_bounds_broken_1;
-    
+
     int* OrderedCells;
-    
+
     int number_of_secondary_cells_removed;
 
     JJData *jjData;
-    
+
     time_t start_seconds;
     time_t stop_seconds;
-    
+
     void allocate_cell_bounds_memory();
     void init_cell_bounds();
     void release_cell_bounds_memory();
@@ -119,5 +119,5 @@ private:
     void eliminate_secondary_suppression();
     void display_secondary_suppression();
     int index(int x, int y);
-    
+
 };

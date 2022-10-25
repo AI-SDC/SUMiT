@@ -46,7 +46,7 @@ public class UWECellSuppressionServer {
         Logger.log("Java " + System.getProperty("java.version") + " "+ System.getProperty("java.vendor"));
         Logger.log(Runtime.getRuntime().availableProcessors() + " cores");
         Logger.log(additionalCores + " additional cores");
-        
+
         try {
             // Create directory to store files
             Path path = FileSystems.getDefault().getPath("store");
@@ -85,7 +85,7 @@ public class UWECellSuppressionServer {
             // Handle connections
             try {
                 ServerSocket serverSocket = new ServerSocket(1081);
-                
+
                 while (true) {
                     Socket socket = serverSocket.accept();
                     executor.execute(new RequestHandler(socket));
@@ -100,17 +100,17 @@ public class UWECellSuppressionServer {
             }
         } catch (InterruptedException e) {
             Logger.log("Aborting");
-            
+
             // Set the error status to the same as used by Bash when script terminated by control-c
             System.exit(130);
         }
     }
-    
+
     private static Session getSession(String query) {
         if (query == null) {
             return null;
         }
-        
+
         String[] elements = query.split("&");
         for (String s : elements) {
             if (s.startsWith("session=")) {
@@ -129,7 +129,7 @@ public class UWECellSuppressionServer {
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -143,7 +143,7 @@ public class UWECellSuppressionServer {
 
                 if (request != null) {
                     Logger.log("Request: %s", request);
-                    
+
                     String[] tokens = request.split(" ");
                     String method = tokens[0];
 
@@ -412,7 +412,7 @@ public class UWECellSuppressionServer {
                                         break;
                                 }
                                 break;
-                                
+
                             default:
                                 Logger.log("Unknown method: %s", method);
                                 status = 404;
@@ -460,7 +460,7 @@ public class UWECellSuppressionServer {
                         out.print("\r\n");
                         out.print(response);
                         out.flush();
-                        
+
                         if (response.length() < 64) {
                             Logger.log("Reply: %s", response);
                         } else {

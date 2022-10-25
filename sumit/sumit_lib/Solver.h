@@ -16,11 +16,11 @@
 #define SESSION_EXCEPTION 111
 
 class Solver {
-    
+
 public:
     const char *host;
     const char *port;
-    
+
     Solver(const char *host, const char *port);
     ~Solver();
     char *getSession();
@@ -36,7 +36,7 @@ public:
 
 private:
     char session[64];
-    
+
     void run_model(const char *injjfilename, const char *perm_filename, const char *protection_type, const char *model_type, double max_cost);
-    
+
 };

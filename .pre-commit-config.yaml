@@ -30,7 +30,7 @@ repos:
     rev: v2.2.1
     hooks:
       - id: codespell
-        args: ["-L", "larg"]
+        args: ["-L", "fo"]
         exclude: >
             (?x)^(
                 .*\.txt|

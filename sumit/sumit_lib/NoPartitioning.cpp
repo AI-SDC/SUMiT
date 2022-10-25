@@ -6,9 +6,9 @@
 // Partition JJ data
 NoPartitioning::NoPartitioning(const char* filename) {
     logger->log(3, "No partitioning");
-    
+
     jjData = new JJData(filename);
-    
+
     number_of_partitions = 1;
 }
 
@@ -22,7 +22,7 @@ void NoPartitioning::write_partitioned_jj_file(int index, const char* jj_filenam
     if (index >= number_of_partitions) {
         logger->error(1, "Partition index out of bounds");
     }
-    
+
     jjData->write_jj_file(jj_filename);
 }
 
@@ -32,7 +32,7 @@ int NoPartitioning::get_number_of_cells(int index) {
     if (index >= number_of_partitions) {
         logger->error(1, "Partition index out of bounds");
     }
-    
+
     return jjData->get_number_of_cells();
 }
 
@@ -43,6 +43,6 @@ int NoPartitioning::get_number_of_primary_cells(int index) {
     if (index >= number_of_partitions) {
         logger->error(1, "Partition index out of bounds");
     }
-    
+
     return jjData->get_number_of_primary_cells();
 }

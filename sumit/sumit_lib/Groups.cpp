@@ -3,7 +3,7 @@
 
 Groups::Groups(JJData *jjData) {
     this->jjData = jjData;
-    
+
     // Select primary cells and store them
     CellStore *stored_cells = new CellStore(jjData);
     stored_cells->store_selected_cells();
@@ -24,7 +24,7 @@ Groups::Groups(JJData *jjData) {
         constraints_cell_mapping[i].half_sum_upper_protection_levels = 0.0;
         constraints_cell_mapping[i].cell_index = NULL;
     }
-    
+
     // Sort constraints by size
     for (SumIndex i = 0; i < jjData->nsums; i++) {
         for (SumIndex j = 0; j < jjData->nsums; j++) {
@@ -196,7 +196,7 @@ Groups::Groups(JJData *jjData) {
             }
         }
 
-        // Get number of groups        
+        // Get number of groups
         number_of_groups = 0;
 
         for (int i = 0; i < max_groups_limit; i++) {
@@ -233,7 +233,7 @@ Groups::Groups(JJData *jjData) {
             }
         }
     }
-    
+
     delete stored_cells;
 }
 

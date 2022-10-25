@@ -25,9 +25,9 @@ void Logger::terminate(bool error) {
     fflush(stdout);
     sys.duplicate2(stdout_dup, sys.file_number(stdout));
     sys.close(stdout_dup);
-    
+
     // Do not close log file as it is stdout and needs to remain open
-    
+
     if ((! error) && (level == 0)) {
         remove(filename);
     }
@@ -49,7 +49,7 @@ void Logger::log(int level, const char *fmt, ...) {
     if ((level <= this->level) || (summary && (level == 1))) {
         // Get everything ready
         time_t now = time(NULL);
-        
+
         char msg[8192];
 
         va_list args;
@@ -101,7 +101,7 @@ void Logger::error(int error_code, const char *fmt, ...) {
         fprintf(stderr, "%ld Error: %s\n", (long)now, msg);
         fflush(stderr);
     }
-    
+
     terminate(true);
 
     exit(error_code);

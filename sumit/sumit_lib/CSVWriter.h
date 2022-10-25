@@ -9,11 +9,11 @@
 #define MAX_NO_METADATA_FIELDS  30
 
 class CSVWriter {
-    
+
 public:
     CSVWriter(const char* injjfilename);
     ~CSVWriter(void);
-    
+
     // This method is for legacy tabular partitioning only
     void write_csv_file(const char* mapfilename, const char* csvfilename);
 
@@ -25,6 +25,6 @@ private:
     JJData *jjData;
 
     bool getline(FILE* fp, char* buffer);
-    int getTokens(char* instring, char seperator);
+    int getTokens(char* instring, char separator);
 
 };

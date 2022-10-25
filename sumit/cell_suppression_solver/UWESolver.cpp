@@ -92,12 +92,12 @@ int main(int argc, char *argv[]) {
     outjjfilename[0] = '\0';
     permfilename[0] = '\0';
     costfilename[0] = '\0';
-    
+
     time_t startTime = time(NULL);
-    
+
     char log_file_name[MAX_FILENAME_SIZE];
     sprintf(log_file_name, "Solver%dLog.txt", sys.get_process_id());
-    
+
     logger = new Logger(0, log_file_name);
     logger->log(1, "UWESolver v%s", UWEVERSION);
 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     } else {
         logger->error(111, "Cannot get current working directory");
     }
-    
+
     if (argc != 2) {
         logger->error(112, "Incorrect number of arguments");
     }
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     }
 
     logger->log(3, "Arguments: %s", argv[1]);
-    
+
     char key[MAX_ARG_LENGTH];
     char value[MAX_ARG_LENGTH];
     char *p = argv[1];
@@ -131,14 +131,14 @@ int main(int argc, char *argv[]) {
                 k = key;
                 state = 1;
                 break;
-                
+
             case '&':
                 *v = '\0';
                 v = value;
                 state = 0;
                 setKeyValue(key, value);
                 break;
-                
+
             default:
                 if (state == 1) {
                     *v++ = *p;
@@ -146,14 +146,14 @@ int main(int argc, char *argv[]) {
                     *k++ = *p;
                 }
         }
-        
+
         p++;
     }
     if (state == 1) {
         *v = '\0';
         setKeyValue(key, value);
     }
-    
+
     Solver *solver = new Solver(injjfilename, (protection == GROUP_PROTECTION));
 
     logger->log(3, "%d groups", solver->get_number_of_groups());
@@ -165,9 +165,9 @@ int main(int argc, char *argv[]) {
     } else {
         costs = solver->run_group_protection(permfilename, model, max_cost, &costs_size);
     }
-    
+
     solver->write_cost_file(costfilename, costs, costs_size);
-    
+
     time_t now = time(NULL);
     int elapsedTime = (int)(now - startTime);
 
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
     // No use of logger allowed after this statement
     // This must be done before outputting the program's results to stdout because the logger redirects stdout
     delete logger;
-    
+
     // This is the only output allowed to the original stdout
     printf("%lf %d", costs[costs_size - 1], elapsedTime);
 

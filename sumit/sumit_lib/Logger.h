@@ -16,7 +16,7 @@ public:
 private:
     int level;
     char filename[64];
-    
+
     FILE *ofp;
     int stdout_dup;
     bool summary;

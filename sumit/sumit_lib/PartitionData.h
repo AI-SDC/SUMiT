@@ -5,7 +5,7 @@
 #include "GAProtection.h"
 
 class PartitionData {
-    
+
 public:
     int index;
     GAProtection* protection;
@@ -18,7 +18,7 @@ public:
     int number_of_primary_cells;
     int execution_time_seconds;
     double cost;
-        
+
     PartitionData(void);
     ~PartitionData(void);
     void initialise(int id);

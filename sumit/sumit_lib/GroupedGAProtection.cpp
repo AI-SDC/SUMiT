@@ -8,13 +8,13 @@ GroupedGAProtection::GroupedGAProtection(const char *host, const char *port, con
     // Create groups
     Groups *groups = new Groups(jjData);
     number_of_genes = groups->number_of_groups;
-    
+
     logger->log(3, "%d groups", number_of_genes);
-    
+
     allocate_pools();
-    
+
     samples_log = NULL;
-    
+
     if (number_of_genes > 0) {
         if (debugging) {
             samples_log = new SamplesLog(injjfilename, samples_filename, number_of_genes);
@@ -47,7 +47,7 @@ void GroupedGAProtection::protect(bool limit_cost) {
 
     if (number_of_genes > 0) {
         double max_cost = get_worst_fitness();
-        
+
         select_for_pool_mating();
         apply_crossover();
 
@@ -56,11 +56,11 @@ void GroupedGAProtection::protect(bool limit_cost) {
             apply_mutation();
 
             int actual_pool_clones_size = grow_clones_pool(YPLUS_MODEL);
-            
+
             evaluate_fitness(actual_pool_clones_size, pool_clones, GROUP_PROTECTION, YPLUS_MODEL, false, true, limit_cost? max_cost: 0.0);
             replacement(actual_pool_clones_size);
         }
-        
+
         evaluate_best_parent(GROUP_PROTECTION);
     }
 }

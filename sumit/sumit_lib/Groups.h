@@ -18,7 +18,7 @@ public:
     ~Groups();
 
     Groupings *group;
-    
+
 private:
     JJData *jjData;
 

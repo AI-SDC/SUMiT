@@ -8,17 +8,17 @@
 TabularData::TabularData(char* p_metadatafilename, char* p_tabdatafilename) {
     strcpy(tabdatafilename, p_tabdatafilename);
     strcpy(metadatafilename, p_metadatafilename);
-    
+
     logger->log(2, "Tabular data file: %s", tabdatafilename);
 
     if (! file_exists(metadatafilename)) {
         logger->error(1, "File %s does not exist", metadatafilename);
     }
-    
+
     if (! file_exists(tabdatafilename)) {
         logger->error(1, "File %s does not exist", tabdatafilename);
     }
-    
+
     init_metadata_variables();
     init_metadata_work_area();
 
@@ -47,11 +47,11 @@ TabularData::TabularData(char* p_metadatafilename, char* p_tabdatafilename) {
 
     SortKeyFields();
     AddKeyFieldIndexes();
-    
+
     if (debugging) {
         PrintKeyFileds("KeyValues.txt");
     }
-    
+
     DisplayFieldInformation();
 
     logger->log(5, "Convert microdata to JJ format");
@@ -116,7 +116,7 @@ TabularData::TabularData(char* p_metadatafilename, char* p_tabdatafilename) {
             case FIELD_TYPE_STATUS:
                 MetaDataFields[i].UseThisIndex = true;
                 break;
-                
+
             default:
                 // This is here to stop the compiler warning about enumeration values not being handled in the switch
                 break;
@@ -566,7 +566,7 @@ void TabularData::strcpy_without_quotes(char *s, const char *t) {
 
 int TabularData::sscanf2(char* instring, const char* formatstring, char* token1, char* token2) {
     // This is a horribly written bit of code... but I was in a hurry!
-    // formatstring is ignored. It is here for compatability with sscanf()
+    // formatstring is ignored. It is here for compatibility with sscanf()
 
     int number_of_tokens;
     char chr;
@@ -687,7 +687,7 @@ void TabularData::UpdateStatusFromCSVFile(char* csvfilename) {
     if ((ifp = fopen(csvfilename, "r")) == NULL) {
         logger->error(1, "Unable to open CSV file: %s", csvfilename);
     }
-        
+
     while (getline(ifp, InputBuffer)) {
         int number_of_tokens = getTokens(InputBuffer, ',');
 
@@ -1309,7 +1309,8 @@ void TabularData::PrintKeyFileds(const char* outfilename) {
 
                 fprintf(ofp, "\nKEY FIELD: %s", MetaDataFields[i].Name);
                 fprintf(ofp, "\n");
-                fprintf(ofp, "\nNumber of unique key values = %d", NumberOfKeyEntries[k]);
+                fprintf(ofp, "\n");
+                fprintf(ofp, "Number of unique key values = %d", NumberOfKeyEntries[k]);
                 fprintf(ofp, "\n");
 
                 fprintf(ofp, "\nValue\tHierarchy\tIndex");
@@ -1374,7 +1375,7 @@ bool TabularData::ReadCellData() {
 
     logger->log(3, "Number of fields = %d", NumberOfFields);
     logger->log(3, "Field Types:");
-    
+
     for (i = 0; i < NumberOfFields; i++) {
         logger->log(3, "%d", MetaDataFields[i].Type);
     }
@@ -4255,7 +4256,7 @@ int TabularData::GetFieldIndex(char* fieldname) {
     if (NumberOfFields == 0) {
         logger->error(1, "Reading in Tabular data");
     }
-    
+
     for (i = 0; i < NumberOfFields; i++) {
         if (strcmp(MetaDataFields[i].Name, fieldname) == 0) {
             return i;
@@ -4263,7 +4264,7 @@ int TabularData::GetFieldIndex(char* fieldname) {
     }
 
     logger->error(1, "Partition parameter not found: %s", fieldname);
-    
+
     // Keep the compiler from complaining
     return -1;
 }

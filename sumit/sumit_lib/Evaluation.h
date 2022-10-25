@@ -4,7 +4,7 @@
 #include "JJData.h"
 
 class Evaluation {
-    
+
 public:
     Evaluation(const CellIndex *genes, int chromosome_size, int model_type);
     Evaluation(const Evaluation& orig);

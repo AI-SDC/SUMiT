@@ -4,11 +4,11 @@
 #include "JJData.h"
 
 class CellStore {
-    
+
 public:
     CellIndex *cells;
     CellIndex size;
-    
+
     CellStore(JJData *jjData);
     ~CellStore();
     void store_selected_cells();
@@ -18,7 +18,7 @@ public:
     void order_cells_by_largest_weighting();
     void order_cells_by_smallest_protection_level();
     void order_cells_by_smallest_weighting();
-    
+
 private:
     JJData *jjData;
 

@@ -53,7 +53,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/usr/local/lib/clp ../UWECellSuppressionLib/dist/Release/GNU-Linux/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp 
+LDLIBSOPTIONS=-L/usr/local/lib/clp ../UWECellSuppressionLib/dist/Release/GNU-Linux/libuwecellsuppressionlib.a -lCoinUtils -lOsi -lOsiClp
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -67,12 +67,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/uwesolver: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/uwesolver ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/Solver.o: Solver.cpp 
+${OBJECTDIR}/Solver.o: Solver.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -I../UWECellSuppressionLib -I/usr/local/include/clp -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Solver.o Solver.cpp
 
-${OBJECTDIR}/UWESolver.o: UWESolver.cpp 
+${OBJECTDIR}/UWESolver.o: UWESolver.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -I../UWECellSuppressionLib -I/usr/local/include/clp -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/UWESolver.o UWESolver.cpp

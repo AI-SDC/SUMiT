@@ -46,7 +46,7 @@ struct Arg : public option::Arg {
         if (msg) {
             logger->error(1, "Unknown option: %s", option.name);
         }
-        
+
         return option::ARG_ILLEGAL;
     }
 
@@ -58,7 +58,7 @@ struct Arg : public option::Arg {
         if (msg) {
             logger->error(1, "Option requires an argument: %s", option.name);
         }
-        
+
         return option::ARG_ILLEGAL;
     }
 
@@ -70,21 +70,21 @@ struct Arg : public option::Arg {
         if (msg) {
             logger->error(1, "Option requires a non-empty argument: %s", option.name);
         }
-        
+
         return option::ARG_ILLEGAL;
     }
 
     static option::ArgStatus Numeric(const option::Option& option, bool msg) {
         if (option.arg != 0) {
             char* endptr = NULL;
-            
+
             strtol(option.arg, &endptr, 10);
-        
+
             if ((endptr != option.arg) && (*endptr == 0)) {
                 return option::ARG_OK;
             }
         }
-        
+
         if (msg) {
             logger->error(1, "Option requires a numeric argument: %s", option.name);
         }
@@ -205,9 +205,9 @@ bool parseInputs(int argc, char *argv[])
     // Skip the program name
     argc--;
     argv++;
-    
+
     option::Stats stats(usage, argc, argv);
-    
+
 #if defined ( _WIN32) || defined (__clang__)
     // Use calloc() to allocate 0-initialized memory. It's not the same as properly constructed elements, but good enough
     option::Option* options = (option::Option*)calloc(stats.options_max, sizeof (option::Option));
@@ -217,55 +217,55 @@ bool parseInputs(int argc, char *argv[])
     option::Option options[stats.options_max];
     option::Option buffer[stats.buffer_max];
 #endif
-    
+
     option::Parser parse(usage, argc, argv, options, buffer);
-    
+
     if (parse.error()) {
         logger->error(1, "Unable to parse command line arguments");
     }
-    
+
     if (options[HELP] || argc == 0) {
         int columns = getenv("COLUMNS") ? atoi(getenv("COLUMNS")) : 80;
         option::printUsage(fwrite, stderr, usage, columns);
         ok = false;
         return ok;
     }
-    
+
     for (int i = 0; i < parse.optionsCount(); ++i) {
         option::Option& opt = buffer[i];
-        
+
         switch (opt.index()) {
-                
+
             case CONSTRUCTIVE:
                 logger->log(1,"Tree-Based Constructive");
                 gaConstructive = true;
                 break;
-                
+
             case CORES:
                 logger->log(1, "Cores: %s", opt.arg);
                 sscanf(opt.arg, "%u", &cores);
                 break;
-                
+
             case CSV:
                 logger->log(1, "CSV output");
                 csv_output = true;
                 break;
-                
+
             case DEBUGGING:
                 logger->log(1, "Debug mode");
                 debugging = true;
                 break;
-                
+
             case GAELIMINATION:
                 logger->log(1, "GA elimination");
                 gaElimination = true;
                 break;
-                
+
             case GROUPTHRESHOLD:
                 logger->log(1, "Group threshold: %s", opt.arg);
                 sscanf(opt.arg, "%u", &groupThreshold);
                 break;
-                
+
             case ITERATIONS:
                 logger->log(1, "Iterations: %s", opt.arg);
                 sscanf(opt.arg, "%u", &iterations);
@@ -274,18 +274,18 @@ bool parseInputs(int argc, char *argv[])
                 logger->log(1,"LinearRegression-based constructive");
                 gaLinRegress=true;
                 break;
-                
+
             case LOGLEVEL:
                 logger->log(1, "Log level: %s", opt.arg);
                 sscanf(opt.arg, "%u", &logLevel);
                 logger->setLevel(logLevel);
                 break;
-                
+
             case NOCOSTLIMIT:
                 logger->log(1, "No cost limit");
                 no_cost_limit = true;
                 break;
-                
+
             case PARTITIONING:
                 logger->log(1, "Partitioning: %s", opt.arg);
                 if (strlen(opt.arg) < MAX_KEY_SIZE) {
@@ -294,7 +294,7 @@ bool parseInputs(int argc, char *argv[])
                     logger->error(1, "Partitioning algorithm key name is too long");
                 }
                 break;
-                
+
             case PARTITION1:
                 logger->log(1, "Part1: %s", opt.arg);
                 if (strlen(opt.arg) < MAX_KEY_SIZE) {
@@ -303,7 +303,7 @@ bool parseInputs(int argc, char *argv[])
                     logger->error(1, "Partition 1 key name is too long");
                 }
                 break;
-                
+
             case PARTITION2:
                 logger->log(1, "Part2: %s", opt.arg);
                 if (strlen(opt.arg) < MAX_KEY_SIZE) {
@@ -312,7 +312,7 @@ bool parseInputs(int argc, char *argv[])
                     logger->error(1, "Partition 2 key name is too long");
                 }
                 break;
-                
+
             case PORT:
                 logger->log(1, "Port: %s", opt.arg);
                 if (strlen(opt.arg) < MAX_PORT_NUMBER_SIZE) {
@@ -321,7 +321,7 @@ bool parseInputs(int argc, char *argv[])
                     logger->error(1, "Port key name is too long");
                 }
                 break;
-                
+
             case SERVER:
                 logger->log(1, "Server: %s", opt.arg);
                 if (strlen(opt.arg) < MAX_HOST_NAME_SIZE) {
@@ -330,17 +330,17 @@ bool parseInputs(int argc, char *argv[])
                     logger->error(1, "Server key name is too long");
                 }
                 break;
-                
+
             case SEED:
                 logger->log(1, "Seed: %s", opt.arg);
                 sscanf(opt.arg, "%u", &seed);
                 break;
-                
+
             case SILENT:
                 logger->log(1, "Silent");
                 silent = true;
                 break;
-                
+
             case TABLE:
                 logger->log(1, "Table file: %s", opt.arg);
                 size_t len = strlen(opt.arg);
@@ -364,35 +364,35 @@ bool parseInputs(int argc, char *argv[])
                 break;
         }
     }
-    
+
     for (int i = 0; i < parse.nonOptionsCount(); ++i) {
         logger->log(1, "Non-option argument #%d is %s", i, parse.nonOption(i));
     }
-    
+
     if (csv_output && (! tabular_format)) {
         logger->error(1, "CSV output is only available from TAB format input");
     }
-    
-    
+
+
     return ok;
-    
+
 }
 
 void Standard_Inits(void)
 {
     logger = new Logger(1, "Log.txt");
     logger->log(1, "UWECellSuppression v%s", VERSION);
-    
+
     if (sizeof(int) < 4) {
         logger->error(1, "Integer size must be at least four bytes");
     }
-    
+
     strcpy(server, "localhost");
     strcpy(port, "1081");
-    
+
     tableFilename[0] = '\0';
     metadataFilename[0] = '\0';
-    
+
     partitioning_algorithm[0] = '\0';
     partition_by_1[0] = '\0';
     partition_by_2[0] = '\0';
@@ -403,9 +403,9 @@ PartitionData*  makePartitionFiles(int *number_of_partitions)
 {
     int numbermade=0;
     logger->log(1, "Partitioning");
-    
+
     Partitioning* partitioning;
-    
+
     // Convert TAB file input data to JJ format
     if (tabular_format) {
         TabularData* tabular = new TabularData(metadataFilename, tabdataFilename);
@@ -413,7 +413,7 @@ PartitionData*  makePartitionFiles(int *number_of_partitions)
         tabular->PrintJJFileMapping("Mapping.txt");
         delete tabular;
     }
-    
+
     // Select partitioning algorithm
     if (sys.string_case_compare(partitioning_algorithm, "legacy") == 0) {
         if (tabular_format) {
@@ -421,7 +421,7 @@ PartitionData*  makePartitionFiles(int *number_of_partitions)
             legacy_partitioning = true;
         } else {
             logger->error(1, "Legacy partitioning is only available for TAB format input");
-            
+
             // Keep the compiler from complaining
             partitioning = NULL;
         }
@@ -462,35 +462,35 @@ PartitionData*  makePartitionFiles(int *number_of_partitions)
                || (sys.string_case_compare(partitioning_algorithm, "no") == 0)
                || (partitioning_algorithm[0] == '\0')) {
         partitioning = new NoPartitioning(tableFilename);
-    } 
+    }
     else {
         logger->error(1, "Unknown partitioning algorithm %s", partitioning_algorithm);
-        
+
         // Keep the compiler from complaining
         partitioning = NULL;
     }
-    
+
     numbermade = partitioning->get_number_of_partitions();
-    
+
     PartitionData* partition = new PartitionData[numbermade];
-    
+
     for (int i = 0; i < numbermade; i++) {
         logger->log(2, "Partition %d", i + 1);
-        
+
         partition[i].initialise(i + 1);
-        
+
         partitioning->write_partitioned_jj_file(i, partition[i].in_jj_file);
-        
+
         // The call to get_number_of_cells must only occur after the call to write_partitioned_jj_file
         logger->log(2, "Partition %d size %d", i + 1, partitioning->get_number_of_cells(i));
-        
+
         // The call to get_number_of_primary_cells must only occur after the call to write_partitioned_jj_file
         partition[i].number_of_primary_cells = partitioning->get_number_of_primary_cells(i);
-        
+
         // To cover the case where the GA is not run on a partition, create an initial output file equal to the input file
         sys.copy_file(partition[i].out_jj_file, partition[i].in_jj_file);
     }
-    
+
     delete partitioning;
 
     //Send results back to main()_
@@ -505,7 +505,7 @@ void AllocatePartitionRuntimes(PartitionData * partition, int number_of_partitio
 int total_required_time_units = 0;
 int total_allocated_execution_time = 0;
     int allocated_execution_time;
-    
+
 for (int i = 0; i < number_of_partitions; i++) {
     total_required_time_units = total_required_time_units + GetRequiredTimeUnits(partition[i].number_of_primary_cells);
 }
@@ -513,14 +513,14 @@ int time_per_unit = TOTAL_EXECUTION_TIME / total_required_time_units;
 
 for (int i = 0; i < number_of_partitions; i++) {
     allocated_execution_time = time_per_unit * GetRequiredTimeUnits(partition[i].number_of_primary_cells);
-    
+
     if (allocated_execution_time < 1000) {
         allocated_execution_time = 1000;
     }
-    
+
     partition[i].execution_time_seconds = allocated_execution_time;
     logger->log(3, "Partition %d allocated %d seconds execution time", i, allocated_execution_time);
-    
+
     total_allocated_execution_time = total_allocated_execution_time + allocated_execution_time;
 }
 logger->log(3, "Total_allocated_execution_time: %d", total_allocated_execution_time);
@@ -557,11 +557,11 @@ else
 {
     partition[i].protection = new GroupedGAProtection(server, port, partition[i].in_jj_file, partition[i].out_jj_file, partition[i].sam_file, seed, cores, partition[i].execution_time_seconds, gaElimination);
 }
-#endif    
-    
-    
-    
-    
+#endif
+
+
+
+
 partition[i].cost = partition[i].protection->fitness();
 }
 
@@ -573,7 +573,7 @@ void UnpickFile(char *jj_filename, double cost)
     char log_message[200];
     char outfilename[256];
     plog->write_log_file(jj_filename, unpicker->GetNumberOfCells(), unpicker->GetNumberOfPrimaryCells(), unpicker->GetNumberOfSecondaryCells(), unpicker->GetNumberOfPrimaryCells_ValueKnownExactly(), unpicker->GetNumberOfPrimaryCells_ValueKnownWithinProtection(), total_counted_evals, cost);
-    
+
     if (unpicker->GetNumberOfPrimaryCells_ValueKnownExactly() > 0) {
         sprintf(log_message, "ERROR> Protection failure, %d primary cells known exactly", unpicker->GetNumberOfPrimaryCells_ValueKnownExactly());
         plog->write_log_message(log_message);
@@ -585,30 +585,30 @@ void UnpickFile(char *jj_filename, double cost)
         sprintf(&outfilename[0],"ExposedPartially_%s.txt",jj_filename);
         unpicker->print_partial_exposure(outfilename);
     }
-    
+
     plog->write_newline();
     delete unpicker;
 }
 void RecombinePartitionsAndTestResultforThisIteration( PartitionData *partition,int number_of_partitions, int iteration)
 {
     logger->log(1, "Recombine partitions");
-    
+
     sprintf(recombined_jj_filename, "Recombined_%05d.jj", iteration);
-    
-    
-    
+
+
+
     if (legacy_partitioning) {
         // Write recombined JJ file
         TabularData* recombined_tabular = new TabularData(metadataFilename, tabdataFilename);
-        
+
         for (int i = 0; i < number_of_partitions; i++) {
             recombined_tabular->UpdateStatusFromCSVFile(partition[i].csv_file);
         }
-        
+
         recombined_tabular->PrintJJFile(recombined_jj_filename);
-        
+
         delete recombined_tabular;
-        
+
         // Write recombined CSV file
         if (csv_output) {
             char recombined_csv_filename[sizeof("Recombined_XXXXX.csv")];
@@ -621,16 +621,16 @@ void RecombinePartitionsAndTestResultforThisIteration( PartitionData *partition,
     else {
         // Write recombined JJ file
         JJData* recombined_jj = new JJData(tableFilename);
-        
+
         for (int i = 0; i < number_of_partitions; i++) {
             recombined_jj->recombine(partition[i].out_jj_file);
         }
-        
+
         recombined_jj->write_jj_file(recombined_jj_filename);
-        
+
         delete recombined_jj;
     }
-    
+
     // Unpick recombined if necessary
     logger->log(2, "Unpick recombined");
     double combined_cost=0.0;
@@ -645,7 +645,7 @@ void CleanupPartitions(PartitionData * partition, int number_of_partitions){
     for (int i = 0; i < number_of_partitions; i++) {
         delete partition[i].protection;
         partition[i].protection = NULL;
-        
+
         // Tidy up legacy partitioning temporary files
         if ((! debugging) && (legacy_partitioning)) {
             sys.remove_file(partition[i].csv_file);
@@ -653,7 +653,7 @@ void CleanupPartitions(PartitionData * partition, int number_of_partitions){
             sys.remove_file(partition[i].metadata_file);
         }
     }
-    
+
     // Tidy up temporary files
     if (! debugging) {
         for (int i = 0; i < number_of_partitions; i++) {
@@ -661,7 +661,7 @@ void CleanupPartitions(PartitionData * partition, int number_of_partitions){
             sys.remove_file(partition[i].out_jj_file);
         }
     }
-    
+
     delete[] partition;
 }
 
@@ -671,28 +671,28 @@ void RemoveUnneededFiles(void){
         if (tabular_format) {
             sys.remove_file("Mapping.txt");
         }
-        
+
         if (legacy_partitioning) {
             // Remove the hierarchy files created by legacy partitioning
             // This is a hack because the intention is to remove legacy partitioning!
-            
+
 #ifdef _WIN32
             const char* rm = "del";
 #else
             const char* rm = "rm";
 #endif
             char cmd[MAX_KEY_SIZE + 10];
-            
+
             sprintf(cmd, "%s %s*.txt", rm, partition_by_1);
             int rc = system(cmd);
-            
+
             if (rc != 0) {
                 logger->log(3, "Error %d removing hierarchy files: %s", rc, partition_by_1);
             }
-            
+
             sprintf(cmd, "%s %s*.txt", rm, partition_by_2);
             rc = system(cmd);
-            
+
             if (rc != 0) {
                 logger->log(3, "Error %d removing hierarchy files: %s", rc, partition_by_2);
             }
@@ -702,7 +702,7 @@ void RemoveUnneededFiles(void){
 
 void Elimination(char *recombined_jj_filename){
     logger->log(1, "Eliminate");
-    
+
     double cost_after_elimination = 0.0;
 #if USE_SMALLER_ELIMINATION
     CEliminate* eliminate = new CEliminate(recombined_jj_filename);
@@ -713,19 +713,19 @@ void Elimination(char *recombined_jj_filename){
     cost_after_elimination = eliminate->getCost();
     eliminate->WriteJJFile("Eliminated.jj");
     delete eliminate;
-    
+
     // Unpick eliminated
     logger->log(1, "Unpick eliminated");
     char elimname[256];
     sprintf(elimname,"Eliminated.jj");
     UnpickFile(elimname, cost_after_elimination);
-    
-    
+
+
     // Write eliminated CSV file
     if (tabular_format && csv_output) {
         CSVWriter* jj_format_data = new CSVWriter("Eliminated.jj");
         jj_format_data->write_csv_file("Mapping.txt", "Eliminated.csv");
-        
+
         delete jj_format_data;
     }
 }
@@ -733,12 +733,12 @@ void Elimination(char *recombined_jj_filename){
 int main(int argc, char* argv[]) {
     int number_of_partitions=0;
     time_t start_time = time(NULL);
-    
+
     Standard_Inits();//sets up log files
     //read input and set values of variables for table file name, task etc etc
     if (parseInputs(argc, argv) != true)
         return 0;
-    
+
     plog = new ProgressLog("ProgressLog.txt");
     // Switch off console output if required
     logger->consoleSummary(! silent);
@@ -746,14 +746,14 @@ int main(int argc, char* argv[]) {
     // Create one or more partitions: each with its own JJ and mapping files, and holding its own state
     PartitionData* partition = makePartitionFiles(&number_of_partitions);
     AllocatePartitionRuntimes( partition,  number_of_partitions );
-    
-   
+
+
     // Initial evaluation of each partition to create first set of partial solutions
     for (int i = 0; i < number_of_partitions; i++) {
             CreateAndTestFirstSetOfSolutionsForPartition(partition, i);
     }
 
-    
+
     //this is the main iteration loop of the algorithm
     // Each partition gets further runtime to produce a better partial solution,
     //as long as there is run time left *for that partition*
@@ -775,13 +775,13 @@ int main(int argc, char* argv[]) {
                 done = false;
                 total_counted_evals = total_counted_evals + partition[i].protection->number_of_evaluations();
             }
-            
-            
+
+
             //unpick partition (which may be the only one) as a safety check
             logger->log(1, "Unpick partition %d", i + 1);
             UnpickFile(partition[i].out_jj_file, partition[i].cost);
-            
- 
+
+
             // Create partitioned CSV files if using legacy parittioning
             if (legacy_partitioning){
                 CSVWriter* jj_format_data = new CSVWriter(partition[i].out_jj_file);
@@ -798,15 +798,15 @@ int main(int argc, char* argv[]) {
         if (iteration == iterations) {
             done = true;
         }
-        
+
         iteration++;
     } while (! done);
 
     CleanupPartitions(partition, number_of_partitions);//do this here as the post processign can be memory-hungry
-    
+
     // Elimination Post processing to optimise final solution
     Elimination(recombined_jj_filename);
- 
+
 
     // Finish up
     RemoveUnneededFiles();
@@ -814,6 +814,6 @@ int main(int argc, char* argv[]) {
     logger->log(1, "Done");
     delete logger;
     delete plog;
-    
+
     return 0;
 }

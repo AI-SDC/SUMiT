@@ -13,15 +13,15 @@ import java.io.IOException;
  * @author cns
  */
 public class Logger {
-    
+
     private static final Logger instance;
-    
+
     private static FileWriter writer = null;
-    
+
     static {
         instance = new Logger();
     }
-    
+
     private Logger() {
         try {
             writer = new FileWriter("ServerLog.txt");
@@ -29,7 +29,7 @@ public class Logger {
             writer = null;
         }
     }
-    
+
     public final static Logger getInstance() {
         return instance;
     }
@@ -44,7 +44,7 @@ public class Logger {
             }
         }
     }
-    
+
     public static void log(String format, Object ... args) {
         if (writer != null) {
             long now = System.currentTimeMillis();
@@ -61,5 +61,5 @@ public class Logger {
             }
         }
     }
-    
+
 }

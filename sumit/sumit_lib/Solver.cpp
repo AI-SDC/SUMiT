@@ -45,22 +45,22 @@ void Solver::run_model(const char *injjfilename, const char *perm_filename, cons
     server->put_file("file", injjfilename, query);
 
     delete server;
-    
+
     // Transfer permutation file to server and run model
     server = new ServerConnection(host, port);
 
     sprintf(query, "session=%s&protection=%s&model=%s&maxcost=%lf", session, protection_type, model_type, max_cost);
-    
+
     server->put_file("perm", perm_filename, query);
 
     delete server;
 }
 
-// The remote solver interpretes a max_cost of zero to mean unlimited cost (and hence no early termination)
+// The remote solver interprets a max_cost of zero to mean unlimited cost (and hence no early termination)
 void Solver::runProtection(const char *injjfilename, const char *perm_filename, int protection_type, int model_type, double max_cost) {
     char *protection = NULL;
     char *model = NULL;
-    
+
     switch (protection_type) {
         case INDIVIDUAL_PROTECTION:
             protection = (char *)"individual";
@@ -97,12 +97,12 @@ int Solver::getLimit() {
     sprintf(request, "limit");
     server->get(request, reply, sizeof(reply));
     delete server;
-    
+
     int limit = 0;
     if (sscanf(reply, "%d", &limit) != 1) {
         logger->error(1, "Invalid limit response from server");
     }
-    
+
     return limit;
 }
 
@@ -114,12 +114,12 @@ int Solver::getCores() {
     sprintf(request, "cores");
     server->get(request, reply, sizeof(reply));
     delete server;
-    
+
     int cores = 0;
     if (sscanf(reply, "%d", &cores) != 1) {
         logger->error(1, "Invalid cores response from server");
     }
-    
+
     return cores;
 }
 
@@ -131,12 +131,12 @@ int Solver::getProtocol() {
     sprintf(request, "protocol");
     server->get(request, reply, sizeof(reply));
     delete server;
-    
+
     int protocol = 0;
     if (sscanf(reply, "%d", &protocol) != 1) {
         logger->error(1, "Invalid protocol response from server");
     }
-    
+
     return protocol;
 }
 
@@ -148,12 +148,12 @@ int Solver::getStatus() {
     sprintf(request, "status?session=%s", session);
     server->get(request, reply, sizeof(reply));
     delete server;
-    
+
     int status;
     if (sscanf(reply, "%d", &status) != 1) {
         logger->error(1, "Invalid status response from server (\"%s\")", reply);
     }
-    
+
     return status;
 }
 
@@ -165,12 +165,12 @@ double Solver::getResult() {
     sprintf(request, "result?session=%s", session);
     server->get(request, reply, sizeof(reply));
     delete server;
-    
+
     double result;
     if (sscanf(reply, "%lf", &result) != 1) {
         logger->error(1, "Invalid result response from server (\"%s\")", reply);
     }
-    
+
     return result;
 }
 
@@ -182,12 +182,12 @@ int Solver::getElapsedTime() {
     sprintf(request, "time?session=%s", session);
     server->get(request, reply, sizeof(reply));
     delete server;
-    
+
     int elapsedTime;
     if (sscanf(reply, "%d", &elapsedTime) != 1) {
         logger->error(1, "Invalid time response from server (\"%s\")", reply);
     }
-    
+
     return elapsedTime;
 }
 

@@ -25,14 +25,14 @@ public class Session implements AutoCloseable {
     private long keepalive = System.currentTimeMillis();
     private int status = -2;
     private String[] results = null;
-    
+
     public Session() {
 
     }
-    
+
     public void run(String query) {
         this.query = query;
-                
+
         String solver;
         if (System.getProperty("os.name").equals("Windows")) {
             solver = "uwesolver.exe";
@@ -40,7 +40,7 @@ public class Session implements AutoCloseable {
             solver = "UWESolver";
         }
         String command = new File(System.getProperty("user.dir"), solver).toString();
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append("infile=");
         sb.append(new File(UWECellSuppressionServer.store, infile).toString());
@@ -53,7 +53,7 @@ public class Session implements AutoCloseable {
         sb.append("&");
         sb.append(query);
         String args = sb.toString();
-        
+
         try {
             Logger.log("Running: %s %s", command, args);
             ProcessBuilder pb = new ProcessBuilder(command, args);
@@ -63,7 +63,7 @@ public class Session implements AutoCloseable {
             Logger.log("Error: Cannot execute solver");
         }
     }
-    
+
     @Override
     public void close() {
         if (process != null) {
@@ -78,13 +78,13 @@ public class Session implements AutoCloseable {
             process.destroy();
             process = null;
         }
-        
+
         new File(store, infile).delete();
         new File(store, outfile).delete();
         new File(store, permfile).delete();
         new File(store, costfile).delete();
     }
-    
+
     public synchronized int status() {
         if (process == null) {
             return status;
@@ -142,7 +142,7 @@ public class Session implements AutoCloseable {
                 status = -1;
             }
         }
-        
+
         return status;
     }
 
@@ -155,7 +155,7 @@ public class Session implements AutoCloseable {
             return "";
         }
     }
-    
+
     public synchronized String elapsedTime() {
         if (results != null) {
             return results[1];
@@ -163,22 +163,22 @@ public class Session implements AutoCloseable {
             return "";
         }
     }
-    
+
     public synchronized String statusString() {
         String s;
         switch (status) {
             case -2:
                 s = "not started";
                 break;
-                
+
             case -1:
                 s = "running";
                 break;
-                
+
             case 0:
                 s = "completed";
                 break;
-                
+
             default:
                 if (status < 0) {
                     s = "unknown";
@@ -186,16 +186,16 @@ public class Session implements AutoCloseable {
                     s = "failed";
                 }
         }
-        
+
         return s;
     }
-    
+
     public void keepAlive() {
         keepalive = System.currentTimeMillis();
     }
-    
+
     public boolean orphanned() {
         return ((System.currentTimeMillis() - keepalive) > (3600 * 1000));
     }
-    
+
 }

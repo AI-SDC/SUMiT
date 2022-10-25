@@ -33,7 +33,7 @@ System::System() {
         printf("Error: WSAStartup failed: %d\n", result);
         exit(1);
     }
-    
+
     milliseconds = 0;
 #else
     // Sleep methods
@@ -59,7 +59,7 @@ void System::initialise_sleep(int milliseconds) {
     } else {
          req.tv_sec = milliseconds / 1000;
          req.tv_nsec = (milliseconds % 1000) * 1000000;
-    } 
+    }
 #endif
 }
 
@@ -74,19 +74,19 @@ void System::sleep() {
 char* System::time_string(time_t* tm) {
     static char str[100];
     time_t t;
-    
+
     if (tm) {
         t =* tm;
     } else {
         t = time(NULL);
     }
-    
+
 #ifdef _WIN32
     strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S %z", localtime(&t));
 #else
     strftime(str, sizeof(str), "%F %T%z", localtime(&t));
 #endif
-    
+
     return str;
 }
 
@@ -159,7 +159,7 @@ SOCKET System::open_socket(const char* host, const char* port) {
     }
 
     freeaddrinfo(result);
-    
+
     return sock;
 }
 
@@ -271,14 +271,14 @@ char* System::get_current_working_directory(char* buffer, int size) {
 
 char* System::base_name(const char* path) {
     static char base[MAX_FILENAME_SIZE];
-    
+
 #ifdef _WIN32
     _splitpath(path, NULL, NULL, base, NULL);
-    
+
 #else
     // Get the base name with extension
     strcpy(base, basename((char* )path));
-    
+
     // Remove the extension
     char* p = base + strlen(base) - 1;
     while (*p != '.') {
@@ -288,7 +288,7 @@ char* System::base_name(const char* path) {
         *p = '\0';
     }
 #endif
-    
+
     return base;
 }
 
@@ -337,5 +337,5 @@ int System::close(int fd) {
     return _close(fd);
 #else
     return ::close(fd);
-#endif    
+#endif
 }

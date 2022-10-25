@@ -30,7 +30,7 @@ class Solver {
 public:
     Solver(const char* injjfilename, bool groupProtection);
     ~Solver();
-    
+
     double* run_individual_protection(const char* perm_filename, int model_type, double max_cost, int* costs_size);
     double* run_group_protection(const char* perm_filename, int model_type, double max_cost, int* costs_size);
     int get_number_of_groups();
@@ -42,9 +42,9 @@ private:
     JJData *jjData;
     Groups *groups;
     int number_of_groups;
- 
-    
-    
+
+
+
     ///////////////////////////////////////////////////////////////////////////////////////
     ///////                             Time Data                                    //////
     ///////////////////////////////////////////////////////////////////////////////////////

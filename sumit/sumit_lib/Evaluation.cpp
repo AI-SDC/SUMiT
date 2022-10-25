@@ -9,7 +9,7 @@ Evaluation::Evaluation(const CellIndex *genes, int genome_size, int model_type) 
     for (int i = 0; i < genome_size; i++) {
         this->genes[i] = genes[i];
     }
-    
+
     this->genome_size = genome_size;
     this->model_type = model_type;
 }
@@ -17,11 +17,11 @@ Evaluation::Evaluation(const CellIndex *genes, int genome_size, int model_type) 
 Evaluation::Evaluation(const Evaluation& orig) {
     // Chromosome must be self-contained, so copy
     genes = new CellIndex[orig.genome_size];
-    
+
     for (int i = 0; i < orig.genome_size; i++) {
         genes[i] = orig.genes[i];
     }
-    
+
     genome_size = orig.genome_size;
     model_type = orig.model_type;
 }
@@ -57,8 +57,8 @@ void Evaluation::log_genome() {
     for (int i = 0; i < genome_size; i++) {
         p += sprintf(p, " %d", genes[i]);
     }
-    
+
     logger->log(4, "Genome: %s", str);
-    
+
     delete[] str;
 }

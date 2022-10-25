@@ -11,13 +11,13 @@ IncrementalGAProtection::IncrementalGAProtection(const char *host, const char *p
     stored_cells->store_selected_cells();
     stored_cells->order_cells_by_largest_weighting();
     number_of_genes = stored_cells->size;
-    
+
     logger->log(3, "%d primary cells", number_of_genes);
-    
+
     allocate_pools();
 
     samples_log = NULL;
-    
+
     if (number_of_genes > 0) {
         if (debugging) {
             samples_log = new SamplesLog(injjfilename, samples_filename, number_of_genes);
@@ -26,7 +26,7 @@ IncrementalGAProtection::IncrementalGAProtection(const char *host, const char *p
         // Descending order of cells by loss of information weight
         for (int i = 0; i < pool_parent_size; i++) {
             for (GeneIndex j = 0; j < number_of_genes; j++) {
-                pool_parent[i].genes[j] = stored_cells->cells[j]; 
+                pool_parent[i].genes[j] = stored_cells->cells[j];
             }
         }
 
@@ -41,7 +41,7 @@ IncrementalGAProtection::IncrementalGAProtection(const char *host, const char *p
         evaluate_fitness(pool_parent_size, pool_parent, INDIVIDUAL_PROTECTION, YPLUS_MODEL, false, true, 0.0);
         evaluate_best_parent(INDIVIDUAL_PROTECTION);
     }
-    
+
     delete stored_cells;
 }
 
@@ -50,7 +50,7 @@ void IncrementalGAProtection::protect(bool limit_cost) {
 
     if (number_of_genes > 0) {
         double max_cost = get_worst_fitness();
-        
+
         select_for_pool_mating();
         apply_crossover();
 
@@ -59,7 +59,7 @@ void IncrementalGAProtection::protect(bool limit_cost) {
             apply_mutation();
 
             int actual_pool_clones_size = grow_clones_pool(YPLUS_MODEL);
-            
+
             evaluate_fitness(actual_pool_clones_size, pool_clones, INDIVIDUAL_PROTECTION, YPLUS_MODEL, false, true, limit_cost? max_cost: 0.0);
             replacement(actual_pool_clones_size);
         }

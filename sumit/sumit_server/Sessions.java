@@ -17,16 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author cns
  */
 public class Sessions {
-    
+
     public final int limit;
-    
+
     private final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap();
     private final Object sessionsLock = new Object();
 
     public Sessions(int limit) {
         this.limit = limit;
     }
-    
+
     // Clean up open sessions but do not remove from map to avoid concurrency issues (with no synchronisation) or potential deadlock issues (with synchronisation)
     public void shutdown() {
         Set<Map.Entry<String, Session>> entrySet = sessions.entrySet();
@@ -39,7 +39,7 @@ public class Sessions {
             }
         }
     }
-    
+
     public void checkForOrphans() {
         synchronized(sessionsLock) {
             Set<Map.Entry<String, Session>> entrySet = sessions.entrySet();
@@ -58,13 +58,13 @@ public class Sessions {
             }
         }
     }
-    
+
     public Session create() {
         synchronized(sessionsLock) {
             if (sessions.size() < limit) {
                 Session session = new Session();
                 sessions.put(session.id, session);
-                
+
                 return session;
             } else {
                 return null;
@@ -86,5 +86,5 @@ public class Sessions {
     public Iterator<Entry<String, Session>> iterator() {
         return sessions.entrySet().iterator();
     }
-    
+
 }

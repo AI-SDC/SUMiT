@@ -20,24 +20,24 @@ GAProtection::GAProtection(const char *host, const char *port, const char *injjf
     logger->log(3, "%d second time limit", max_seconds);
 
     jjData = new JJData(injjfilename);
-    
+
     if (jjData->get_number_of_primary_cells() != 0) {
         algorithm_for_selection = SELECTION_TOURNAMENT;
         algorithm_for_crossover = CROSSOVER_ORDER;
         algorithm_for_mutation = MUTATION_ASSORTED;
         algorithm_for_replacement = REPLACE_TOURNAMENT;
         mutation_type = MUTATION_SWAP;
-        
+
         strcpy(this->host, host);
         strcpy(this->port, port);
 
         if (seed != 0) {
             random.seed(seed);
         }
-        
+
         // Check for available server cores
         int available_cores = 0;
-        
+
         try {
             Solver *solver = new Solver(host, port);
             if (solver->getProtocol() != 4) {
@@ -76,12 +76,12 @@ GAProtection::GAProtection(const char *host, const char *port, const char *injjf
                 // Automatic server selection of number of cores
                 this->cores = available_cores;
                 break;
-                
+
             case 1:
                 // Manual selection of number of cores
                 logger->error(1, "Minimum allowable number of cores is two");
                 break;
-                
+
             default:
                 // Manual selection of number of cores
                 this->cores = MIN(cores, available_cores);
@@ -92,7 +92,7 @@ GAProtection::GAProtection(const char *host, const char *port, const char *injjf
         if (this->cores > POOL_PARENT_SIZE) {
             this->cores = POOL_PARENT_SIZE;
         }
-        
+
         logger->log(3, "%d cores available", available_cores);
         logger->log(3, "Using %d cores", this->cores);
     } else {
@@ -100,7 +100,7 @@ GAProtection::GAProtection(const char *host, const char *port, const char *injjf
         default_number_of_clones = 0;
         pool_clones_size = 0;
     }
-    
+
     replace_next = 0;
 
     number_of_evals = 0;
@@ -116,21 +116,21 @@ GAProtection::~GAProtection(void) {
 //        logger->log(4, "Evaluation cache full model hits: %d (%.1f%%)", evaluationCache->hits[FULL_MODEL], (float)(evaluationCache->hits[FULL_MODEL] * 100) / (float)evaluationCache->requests[FULL_MODEL]);
 //        logger->log(4, "Evaluation cache full model misses: %d (%.1f%%)", evaluationCache->misses[FULL_MODEL],  (float)(evaluationCache->misses[FULL_MODEL] * 100) / (float)evaluationCache->requests[FULL_MODEL]);
 //    }
-    
+
     logger->log(4, "Evaluation cache yplus model requests: %d", evaluationCache->requests[YPLUS_MODEL]);
     if (evaluationCache->requests[YPLUS_MODEL] > 0) {
         logger->log(4, "Evaluation cache yplus model hits: %d (%.1f%%)", evaluationCache->hits[YPLUS_MODEL], (float)(evaluationCache->hits[YPLUS_MODEL] * 100) / (float)evaluationCache->requests[YPLUS_MODEL]);
         logger->log(4, "Evaluation cache yplus model misses: %d (%.1f%%)", evaluationCache->misses[YPLUS_MODEL], (float)(evaluationCache->misses[YPLUS_MODEL] * 100) / (float)evaluationCache->requests[YPLUS_MODEL]);
     }
-    
+
     logger->log(4, "Evaluation cache yminus model requests: %d", evaluationCache->requests[YMINUS_MODEL]);
     if (evaluationCache->requests[YMINUS_MODEL] > 0) {
         logger->log(4, "Evaluation cache yminus model hits: %d (%.1f%%)", evaluationCache->hits[YMINUS_MODEL], (float)(evaluationCache->hits[YMINUS_MODEL] * 100) / (float)evaluationCache->requests[YMINUS_MODEL]);
         logger->log(4, "Evaluation cache yminus model misses: %d (%.1f%%)", evaluationCache->misses[YMINUS_MODEL], (float)(evaluationCache->misses[YMINUS_MODEL] * 100) / (float)evaluationCache->requests[YMINUS_MODEL]);
     }
-    
+
     delete evaluationCache;
-    
+
     if (pool_parent != NULL) {
         for (int i = 0; i < POOL_PARENT_SIZE; i++) {
             delete[] pool_parent[i].costs;
@@ -174,9 +174,9 @@ GAProtection::~GAProtection(void) {
     if (samples_log != NULL) {
         delete samples_log;
     }
-    
+
     delete jjData;
-    
+
     logger->log(3, "GA elapsed time %d seconds: %s", (int)(time(NULL) - start_seconds), injjfilename);
 }
 
@@ -249,7 +249,7 @@ void GAProtection::allocate_pools() {
                 pool_clones[i].fitness = 0.0;
             }
     }
-    
+
     evaluationCache = new EvaluationCache(number_of_genes);
 }
 
@@ -277,7 +277,7 @@ bool GAProtection::invalid_offspring(int offspring) {
             rc = true;
         }
     }
-    
+
     return rc;
 }
 
@@ -313,7 +313,7 @@ void GAProtection::copy_individual(struct Individual* to, struct Individual* fro
     if (from->number_of_costs > number_of_genes) {
         logger->error(1, "Incorrect number of costs");
     }
-    
+
     for (GeneIndex i = 0; i < number_of_genes; i++) {
         to->genes[i] = from->genes[i];
     }
@@ -430,7 +430,7 @@ void GAProtection::selection_proportionate() {
             copy_individual(&pool_mating[i], &pool_parent[l]);
         }
     }
-    
+
     delete[] fitness_proportionate;
 }
 
@@ -484,7 +484,7 @@ CellIndex GAProtection::find_gene_location(int parent, int gene) {
             rc = i;
         }
     }
-    
+
     if (rc == -1) {
         logger->error(1, "Gene %d not found in parent %d", gene, parent);
     }
@@ -669,7 +669,7 @@ void GAProtection::crossover_distance_preserving(int parent1, int parent2) {
         print_crossover_details(parent1, parent2, number_of_offspring);
         logger->error(1, "Invalid offspring");
     }
-    
+
     number_of_offspring++;
 }
 
@@ -755,7 +755,7 @@ bool GAProtection::valid_mating(int parent) {
 void GAProtection::apply_crossover() {
     int parent1;
     int parent2;
-    
+
     number_of_offspring = 0;
 
     while (number_of_offspring < POOL_OFFSPRING_SIZE) {
@@ -953,7 +953,7 @@ void GAProtection::apply_mutation() {
     }
 
     double mutation_rate = 1.0 / (double)number_of_genes;
-    
+
     for (int offspring = random_offspring; offspring < default_number_of_clones; offspring++) {
 
         switch (algorithm_for_mutation) {
@@ -1007,7 +1007,7 @@ int GAProtection::get_fittest_clone(int pool_size) {
             fittest = i;
         }
     }
-    
+
     int nmr_fittest_clones = 0;
     for (int i = 0; i < pool_size; i++) {
         if (pool_clones[i].fitness == best_fitness) {
@@ -1032,7 +1032,7 @@ int GAProtection::get_fittest_clone(int pool_size) {
                 }
             }
         }
-        
+
         // Keep the compiler from complaining
         logger->error(1, "Unexpected error");
         return 0;
@@ -1042,7 +1042,7 @@ int GAProtection::get_fittest_clone(int pool_size) {
 void GAProtection::replace_nothing(int pool_size) {
     // Get fittest clone
     int fittest = get_fittest_clone(pool_size);
-    
+
     // Add to population and grow population
     copy_individual(&pool_parent[pool_parent_size], &pool_clones[fittest]);
 
@@ -1052,7 +1052,7 @@ void GAProtection::replace_nothing(int pool_size) {
 void GAProtection::replace_oldest(int pool_size) {
     // Get fittest clone
     int fittest = get_fittest_clone(pool_size);
-    
+
     // Do replacement
     copy_individual(&pool_parent[replace_next], &pool_clones[fittest]);
 
@@ -1152,13 +1152,13 @@ bool GAProtection::time_to_terminate() {
     if ((number_of_genes == 0) || terminated) {
         return true;
     }
-    
+
     if (number_of_counted_evals >= max_evaluations) {
         logger->log(3, "GA terminated due to evaluation limit of %d evaluations being reached: %s", max_evaluations, injjfilename);
         terminated = true;
         return true;
     }
-    
+
     double current_fittest = get_best_fitness();
 
     if (fabs(current_fittest - stable_fitness) < FLOAT_PRECISION) {
@@ -1194,11 +1194,11 @@ void GAProtection::increase_polling_delay(int *delay) {
         case 0:
             *delay = 1;
             break;
-            
+
         case 128:
             // Do nothing - maximum value reached
             break;
-            
+
         default:
             *delay *= 2;
     }
@@ -1218,7 +1218,7 @@ int GAProtection::solvers_required(int number_to_evaluate, struct Individual poo
 
     // Check for duplicate individuals
     Evaluation **eval = new Evaluation *[number_to_evaluate];
-    
+
     for (int i = 0; i < number_to_evaluate; i++) {
         if (requires_evaluation[i]) {
             eval[i] = new Evaluation(pool[i].genes, number_of_genes, model_type);
@@ -1245,7 +1245,7 @@ int GAProtection::solvers_required(int number_to_evaluate, struct Individual poo
         if (requires_evaluation[i]) {
             count++;
         }
-        
+
         if (eval[i]) {
             delete eval[i];
         }
@@ -1253,7 +1253,7 @@ int GAProtection::solvers_required(int number_to_evaluate, struct Individual poo
 
     delete[] eval;
     delete[] requires_evaluation;
-    
+
     logger->log(5, "%d solvers required", count);
 
     return count;
@@ -1263,7 +1263,7 @@ void GAProtection::fill_parent_pool(int model_type) {
     // Code assumes that two ordered individuals are already in the pool
     int used_pool_size = 2;
     int solvers_currently_required = solvers_required(used_pool_size, pool_parent, model_type);
-    
+
     // If not all solvers are being utilised fill the pool with new unevaluated random individuals to make use of solvers
     while (solvers_currently_required < pool_parent_size) {
         // Add a random individual to the pool
@@ -1292,12 +1292,12 @@ int GAProtection::grow_clones_pool(int model_type) {
     if (max_solvers != default_number_of_clones) {
         logger->log(3, "Maximum number of solvers is limited to %d", max_solvers);
     }
-    
+
     // Check how many solvers will be needed for the default clone pool
     int solvers_currently_required = solvers_required(used_pool_size, pool_clones, model_type);
 
     int randomisation_attempts = 0;
-    
+
     // If not all solvers are being utilised grow the pool with new unevaluated random individuals to make use of solvers
     while ((solvers_currently_required < max_solvers) && (randomisation_attempts < MAX_RANDOMISATION_ATTEMPTS)) {
         // Add a random individual to the pool
@@ -1313,14 +1313,14 @@ int GAProtection::grow_clones_pool(int model_type) {
             randomisation_attempts = 0;
         }
     }
-    
+
     return used_pool_size;
 }
 
 void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual pool[], int protection_type, int model_type, bool get_outputjjfile, bool count_evals, double max_cost) {
     int elapsed_time;
     bool solver_terminated;
-    
+
     // Sleep quantum is 10 milliseconds
     sys.initialise_sleep(10);
 
@@ -1334,11 +1334,11 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
         if (evaluationCache->cached(pool[i].genes, model_type)) {
             pool[i].number_of_costs = evaluationCache->costs(pool[i].genes, model_type, &pool[i].costs);
             pool[i].fitness = evaluationCache->fitness(pool[i].genes, model_type);
-            
+
             logger->log(3, "Cached fitness evaluation %d %d %d %lf", protection_type, model_type, i, pool[i].fitness);
             evaluationCache->log_genome(pool[i].genes, model_type);
             evaluationCache->log_costs(pool[i].genes, model_type);
-            
+
             status[i] = 0;
         } else {
             status[i] = -3;
@@ -1351,7 +1351,7 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
 
     // Mark duplicate individuals so that they are not evaluated
     Evaluation **eval = new Evaluation *[number_to_evaluate];
-    
+
     for (int i = 0; i < number_to_evaluate; i++) {
         if (status[i] == -3) {
             eval[i] = new Evaluation(pool[i].genes, number_of_genes, model_type);
@@ -1371,12 +1371,12 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
             }
         }
     }
-    
+
     bool complete;
 
     do {
         complete = true;
-        
+
         for (int i = 0; i < number_to_evaluate; i++) {
             if (counter[i] == 0) {
                 switch (status[i]) {
@@ -1397,11 +1397,11 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
                                 logger->error(1, "Unsupported version of client server protocol");
                             }
                             logger->log(5, "Solver %s created", solver[i]->getSession());
-                            
+
                             status[i] = -2;
                             delay[i] = 0;
                             counter[i] = 0;
-                            
+
                             char *in_jj_file;
                             if (model_type == YPLUS_MODEL) {
                                 in_jj_file = injjfilename;
@@ -1411,20 +1411,20 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
                                     logger->error(1, "Missing cached yplus jj file");
                                 }
                             }
-                            
+
                             // Create a permutation file for the solver
                             char temp_file[MAX_FILENAME_SIZE];
                             sys.make_tempfile(temp_file, MAX_FILENAME_SIZE);
                             write_perm_file(temp_file, pool[i].genes, number_of_genes);
 
-                            // The remote solver interpretes a max_cost of zero to mean unlimited cost (and hence no early termination)
+                            // The remote solver interprets a max_cost of zero to mean unlimited cost (and hence no early termination)
                             solver[i]->runProtection(in_jj_file, temp_file, protection_type, model_type, max_cost);
-                            
+
                             sys.remove_file(temp_file);
                         } catch (int e) {
                             // Keep the compiler from complaining
                             e = 0;
-                            
+
                             // Session not available - increase delay for all unallocated solvers
                             increase_polling_delay(&delay[i]);
 
@@ -1469,12 +1469,12 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
                                 solver[i]->getCostFile(temp_file);
                                 pool[i].number_of_costs = read_cost_file(temp_file, pool[i].costs);
                                 sys.remove_file(temp_file);
-                                
+
                                 // Cross-check fitness and costs
                                 if (fabs(pool[i].fitness - pool[i].costs[pool[i].number_of_costs - 1]) >= FLOAT_PRECISION) {
                                     logger->error(1, "Fitness (%lf) does not match costs (%lf)", pool[i].fitness, pool[i].costs[number_of_genes - 1]);
                                 }
-            
+
                                 // Keep a copy of the intermediate result for YPLUS as this may be used as the basis for a subsequent YMINUS model when evaluating the best individual
                                 // Also, the result may be used during GA elimination
                                 char* out_jj_file;
@@ -1504,14 +1504,14 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
                                         sys.copy_file(outjjfilename, out_jj_file);
                                     }
                                 }
-                                
+
                                 delete solver[i];
                                 solver[i] = NULL;
                                 delay[i] = 0;
                                 counter[i] = 0;
 
                                 solver_terminated = (pool[i].number_of_costs == number_of_genes)? false: true;
-                                
+
                                 if (count_evals) {
                                     number_of_counted_evals++;
                                     logger->log(3, "%s fitness evaluation %d %d %d %lf (evaluation %d)", solver_terminated? "Terminated": "Completed", protection_type, model_type, i, pool[i].fitness, number_of_counted_evals);
@@ -1554,11 +1554,11 @@ void GAProtection::evaluate_fitness(int number_to_evaluate, struct Individual po
                 complete = false;
             }
         }
-        
+
         if (! complete) {
             sys.sleep();
         }
-        
+
     } while (! complete);
 
     // Fill in the fitness for duplicate individuals
@@ -1607,7 +1607,7 @@ double GAProtection::evaluate_best_parent(int protection_type) {
     evaluate_fitness(1, &copy, protection_type, YMINUS_MODEL, true, false, 0.0);
     delete[] copy.costs;
     delete[] copy.genes;
-    
+
     return copy.fitness;
 }
 
@@ -1627,13 +1627,13 @@ void GAProtection::write_perm_file(const char* filename, int* perm, int size) {
 
 int GAProtection::read_cost_file(const char* filename, double* costs) {
     FILE *ifp;
-    
+
     int line_number = 0;
 
     if ((ifp = fopen(filename, "r")) == NULL) {
         logger->error(1, "Cost file not found: %s", filename);
     }
-    
+
     for (CellIndex i = 0; i < number_of_genes; i++) {
         if (fscanf(ifp, "%lf\n",  &costs[i]) != 1) {
             break;
@@ -1642,6 +1642,6 @@ int GAProtection::read_cost_file(const char* filename, double* costs) {
     }
 
     fclose(ifp);
-    
+
     return line_number;
 }
