@@ -6,7 +6,8 @@ set(SOLVER_SOURCES Solver.cpp UWESolver.cpp)
 set(SOLVER_HEADERS Solver.h)
 
 # ##############################################################################
-# target: libsolver - solver functions
+# target: solver - stand-alone binary execution
 # ##############################################################################
 
-add_library(solver STATIC ${SOLVER_SOURCES} ${SOLVER_HEADERS})
+add_executable(solver ${SOLVER_SOURCES} ${SOLVER_HEADERS})
+target_link_libraries(solver PUBLIC sumitlib)

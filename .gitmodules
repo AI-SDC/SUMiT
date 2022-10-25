@@ -1,3 +1,6 @@
 [submodule "lib/pybind11"]
 	path = lib/pybind11
 	url = https://github.com/pybind/pybind11
+[submodule "lib/Clp"]
+	path = lib/Clp
+	url = https://github.com/coin-or/Clp
