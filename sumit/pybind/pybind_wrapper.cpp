@@ -20,6 +20,10 @@
 
 #include <Unpicker.h>
 
+System sys;
+Logger *logger = new Logger(1, "Log.txt");
+bool debugging = false;
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(sumit, m)
