@@ -74,11 +74,16 @@ if(ENABLE_DOXYGEN)
   endif()
 endif()
 
+# sumit libs
 add_subdirectory(sumit/sumit_lib)
+
+# suppression tool - executable
 add_subdirectory(sumit/cell_suppression_tool)
 target_include_directories(tool PUBLIC sumit/sumit_lib)
 
-#add_subdirectory(sumit/cell_suppression_solver)
+# suppression solver lib
+# add_subdirectory(sumit/cell_suppression_solver)
+# target_include_directories(solver PUBLIC sumit/sumit_lib)
 
 option(PYLIB "Build Python library" OFF)
 if(PYLIB)
