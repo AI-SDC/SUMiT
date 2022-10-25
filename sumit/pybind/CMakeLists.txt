@@ -1,30 +1,7 @@
 #
 # Copyright (C) 2022 Richard Preen <rpreen@gmail.com>
 
-set(UNPICKER_SOURCES
-    JJData.cpp
-    Unpicker.cpp)
-
-set(UNPICKER_HEADERS
-    JJData.h
-    Unpicker.h
-    UWECellSuppression.h)
-
-# ##############################################################################
-# target: libunpicker - main functions
-# ##############################################################################
-
-add_library(unpicker STATIC ${UNPICKER_SOURCES} ${UNPICKER_HEADERS})
-target_link_libraries(unpicker PUBLIC m)
-
-# ##############################################################################
-# target: main - stand-alone binary execution
-# ##############################################################################
-
-if(MAIN)
-  add_executable(main main.cpp)
-  target_link_libraries(main PUBLIC unpicker)
-endif()
+set(PY_SOURCES pybind_wrapper.cpp)
 
 # ##############################################################################
 # target: sumit.so / .pyd - Python library
@@ -33,5 +10,8 @@ endif()
 if(PYLIB)
   set(PY_SOURCES pybind_wrapper.cpp)
   pybind11_add_module(sumit ${PY_SOURCES})
-  target_link_libraries(sumit PUBLIC unpicker)
+  target_link_libraries(sumit PUBLIC sumitlib)
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/__init__.py" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  file(GLOB PYTHON_EXAMPLES "${CMAKE_CURRENT_SOURCE_DIR}/../../python/*.py")
+  file(COPY ${PYTHON_EXAMPLES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
