@@ -63,6 +63,10 @@ class CMakeBuild(build_ext):
         if platform.system() == "Windows":
             exe += ".exe"
         shutil.copy(self.build_temp + path + exe, self.build_lib + path)
+        self.announce("Copying cell suppression server", level=3)
+        path = "/sumit/sumit_server/"
+        exe = "cell_suppression_server.jar"
+        shutil.copy(self.build_temp + path + exe, self.build_lib + path)
 
 
 this_directory = Path(__file__).parent

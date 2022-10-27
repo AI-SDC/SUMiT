@@ -62,6 +62,11 @@ target_include_directories(cell_suppression_tool PUBLIC sumit/sumit_lib)
 # add_subdirectory(sumit/cell_suppression_solver)
 # target_include_directories(solver PUBLIC sumit/sumit_lib)
 
+# suppression server - jar
+find_package(Java REQUIRED)
+include(UseJava)
+add_subdirectory(sumit/sumit_server)
+
 # copy python
 file(COPY sumit/__init__.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sumit)
 file(GLOB PYTHON_EXAMPLES "python/*")

@@ -21,6 +21,7 @@ datasets in the production and publication of public statistics.
 ### Requirements
 
 * C++11 compliant compiler.
+* [Java JDK](https://openjdk.org)
 * [CMake](https://www.cmake.org "CMake") (>= 3.12)
 * [Python](https://www.python.org "Python") (>= 3.6)
 
