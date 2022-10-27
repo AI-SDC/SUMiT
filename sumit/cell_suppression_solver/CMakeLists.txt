@@ -6,8 +6,8 @@ set(SOLVER_SOURCES Solver.cpp UWESolver.cpp)
 set(SOLVER_HEADERS Solver.h)
 
 # ##############################################################################
-# target: solver - stand-alone binary execution
+# target: cell_suppression_solver - stand-alone binary execution
 # ##############################################################################
 
-add_executable(solver ${SOLVER_SOURCES} ${SOLVER_HEADERS})
-target_link_libraries(solver PUBLIC sumitlib)
+add_executable(cell_suppression_solver ${SOLVER_SOURCES} ${SOLVER_HEADERS})
+target_link_libraries(cell_suppression_solver PUBLIC sumitlib)

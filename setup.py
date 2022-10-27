@@ -7,6 +7,7 @@
 
 import os
 import platform
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -27,7 +28,7 @@ class CMakeBuild(build_ext):
     """Builds CMake extension."""
 
     def build_extension(self, ext):
-        self.announce("Configuring CMake project", level=3)
+        self.announce("Configuring", level=3)
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
@@ -36,9 +37,7 @@ class CMakeBuild(build_ext):
         cmake_args = [
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             "-DCMAKE_BUILD_TYPE=Release",
-            "-DCMAKE_C_COMPILER=gcc",
             "-DCMAKE_CXX_COMPILER=g++",
-            "-DPYLIB=ON",
             "-DNATIVE_OPT=OFF",
         ]
         build_args = [
@@ -54,10 +53,16 @@ class CMakeBuild(build_ext):
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
         )
-        self.announce("Building Python module", level=3)
+        self.announce("Building", level=3)
         subprocess.check_call(
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp
         )
+        self.announce("Copying cell suppression tool", level=3)
+        path = "/sumit/cell_suppression_tool/"
+        exe = "cell_suppression_tool"
+        if platform.system() == "Windows":
+            exe += ".exe"
+        shutil.copy(self.build_temp + path + exe, self.build_lib + path)
 
 
 this_directory = Path(__file__).parent
@@ -74,7 +79,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/AI-SDC/SUMiT",
     packages=find_packages(),
-#    package_data={"sumit": ["tool"]},
+    #    package_data={"cell_suppression_tool": ["tool"]},
     ext_modules=[CMakeExtension("sumit/sumit")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,

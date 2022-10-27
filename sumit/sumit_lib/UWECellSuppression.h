@@ -14,3 +14,5 @@
 extern bool debugging;
 extern Logger *logger;
 extern System sys;
+
+int main(int argc, char* argv[]);

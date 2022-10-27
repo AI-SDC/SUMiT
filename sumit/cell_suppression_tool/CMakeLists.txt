@@ -6,8 +6,10 @@ set(TOOL_SOURCES UWECellSuppression.cpp)
 set(TOOL_HEADERS defaults.h optionparser.h)
 
 # ##############################################################################
-# target: tool - stand-alone binary execution
+# target: cell_suppression_tool - stand-alone binary execution
 # ##############################################################################
 
-add_executable(tool ${TOOL_SOURCES} ${TOOL_HEADERS})
-target_link_libraries(tool PUBLIC sumitlib)
+add_executable(cell_suppression_tool ${TOOL_SOURCES} ${TOOL_HEADERS})
+target_link_libraries(cell_suppression_tool PUBLIC sumitlib)
+
+file(COPY __init__.py tool.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
