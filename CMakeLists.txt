@@ -69,6 +69,8 @@ add_subdirectory(sumit/sumit_server)
 
 # copy python
 file(COPY sumit/__init__.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sumit)
+file(COPY sumit/run.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sumit)
+# copy examples
 file(GLOB PYTHON_EXAMPLES "python/*")
 file(COPY ${PYTHON_EXAMPLES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

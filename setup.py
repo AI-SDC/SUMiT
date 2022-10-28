@@ -67,6 +67,7 @@ class CMakeBuild(build_ext):
         path = "/sumit/sumit_server/"
         exe = "cell_suppression_server.jar"
         shutil.copy(self.build_temp + path + exe, self.build_lib + path)
+        shutil.copy(self.build_temp + path + "manifest.mf", self.build_lib + path)
 
 
 this_directory = Path(__file__).parent

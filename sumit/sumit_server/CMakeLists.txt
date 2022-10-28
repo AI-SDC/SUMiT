@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2022 Richard Preen <rpreen@gmail.com>
 
-set(SERVER_SOURCES 
+set(SERVER_SOURCES
     Logger.java
     OrphanHandler.java
     RequestHandler.java
@@ -13,6 +13,6 @@ set(SERVER_SOURCES
 # target: cell_suppression_server - stand-alone jvm  execution
 # ##############################################################################
 
-add_jar(cell_suppression_server ${SERVER_SOURCES})
+add_jar(cell_suppression_server SOURCES ${SERVER_SOURCES} MANIFEST manifest.mf)
 
 file(COPY __init__.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

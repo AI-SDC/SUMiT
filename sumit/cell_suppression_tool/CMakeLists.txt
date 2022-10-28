@@ -12,4 +12,4 @@ set(TOOL_HEADERS defaults.h optionparser.h)
 add_executable(cell_suppression_tool ${TOOL_SOURCES} ${TOOL_HEADERS})
 target_link_libraries(cell_suppression_tool PUBLIC sumitlib)
 
-file(COPY __init__.py tool.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY __init__.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
