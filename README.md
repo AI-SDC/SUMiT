@@ -56,6 +56,14 @@ $ make
 
 ### Stand-alone
 
+1. Start Server
+
+```
+$ java -jar sumit/sumit_server/cell_suppression_server.jar
+```
+
+2. Run Suppression Tool
+
 ```
 $ ./sumit/cell_suppression_tool/cell_suppression_tool
 ```
