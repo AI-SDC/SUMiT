@@ -1,20 +1,17 @@
-#include "Unpicker.h"
-#include "UWECellSuppression.h"
+#include "stdafx.h"
 #include <float.h>
 #include <math.h>
-#include <stdio.h>
+#include "Unpicker.h"
 
-Unpicker::Unpicker(const char *injjfilename)
-{
+Unpicker::Unpicker(const char* injjfilename) {
     jjData = new JJData(injjfilename);
 
     cell_bounds = new CellBounds[jjData->ncells];
 
     for (CellIndex i = 0; i < jjData->ncells; i++) {
-        if ((jjData->cells[i].status == 'u') ||
-            (jjData->cells[i].status == 'm')) {
-            cell_bounds[i].lower = 0.0; // jjData->cells[i].lower_bound;
-            cell_bounds[i].upper = DBL_MAX; // jjData->cells[i].upper_bound;
+        if ((jjData->cells[i].status == 'u') || (jjData->cells[i].status == 'm')) {
+            cell_bounds[i].lower = 0.0; //jjData->cells[i].lower_bound;
+            cell_bounds[i].upper = DBL_MAX; //jjData->cells[i].upper_bound;
         } else {
             cell_bounds[i].lower = jjData->cells[i].nominal_value;
             cell_bounds[i].upper = jjData->cells[i].nominal_value;
@@ -34,8 +31,7 @@ Unpicker::Unpicker(const char *injjfilename)
     processing_eqtns_upper = NULL;
 }
 
-Unpicker::~Unpicker(void)
-{
+Unpicker::~Unpicker(void) {
     delete[] cell_bounds;
 
     if (consolidated_eqtns != NULL) {
@@ -105,9 +101,7 @@ Unpicker::~Unpicker(void)
     delete jjData;
 }
 
-void
-Unpicker::tidy_up_the_consolidated_equations()
-{
+void Unpicker::tidy_up_the_consolidated_equations() {
     int i;
     int j;
 
@@ -118,16 +112,13 @@ Unpicker::tidy_up_the_consolidated_equations()
             consolidated_eqtns[i].RHS = -1.0 * consolidated_eqtns[i].RHS;
 
             for (j = 0; j < consolidated_eqtns[i].size_of_eqtn; j++) {
-                consolidated_eqtns[i].plus_or_minus[j] =
-                    -1 * consolidated_eqtns[i].plus_or_minus[j];
+                consolidated_eqtns[i].plus_or_minus[j] = -1 * consolidated_eqtns[i].plus_or_minus[j];
             }
         }
     }
 }
 
-void
-Unpicker::consolidate_the_consistency_equations()
-{
+void Unpicker::consolidate_the_consistency_equations() {
     int i;
     int j;
     int nsuppressed;
@@ -149,15 +140,13 @@ Unpicker::consolidate_the_consistency_equations()
             cell_no = jjData->consistency_eqtns[i].cell_index[j];
 
             if ((cell_no >= 0) && (cell_no < jjData->ncells)) {
-                if ((jjData->cells[cell_no].status == 'u') ||
-                    (jjData->cells[cell_no].status == 'm')) {
+                if ((jjData->cells[cell_no].status == 'u') || (jjData->cells[cell_no].status == 'm')) {
                     nsuppressed++;
                 }
             }
         }
 
-        /* If there is one or more suppressed cell then we increment the number
-         * of consolidated equations */
+        /* If there is one or more suppressed cell then we increment the number of consolidated equations */
 
         if (nsuppressed > 0) {
             no_consolidated_eqtns++;
@@ -186,24 +175,19 @@ Unpicker::consolidate_the_consistency_equations()
             cell_no = jjData->consistency_eqtns[i].cell_index[j];
 
             if ((cell_no >= 0) && (cell_no < jjData->ncells)) {
-                if ((jjData->cells[cell_no].status == 'u') ||
-                    (jjData->cells[cell_no].status == 'm')) {
+                if ((jjData->cells[cell_no].status == 'u') || (jjData->cells[cell_no].status == 'm')) {
                     nsuppressed++;
                 }
             }
         }
 
-        /* If there is one or more suppressed cell then we write it to the
-         * consolidated equations */
+        /* If there is one or more suppressed cell then we write it to the consolidated equations */
 
         if (nsuppressed > 0) {
-            consolidated_eqtns[no_consolidated_eqtns].cell_index =
-                new CellIndex[nsuppressed];
-            consolidated_eqtns[no_consolidated_eqtns].plus_or_minus =
-                new int[nsuppressed];
+            consolidated_eqtns[no_consolidated_eqtns].cell_index = new CellIndex[nsuppressed];
+            consolidated_eqtns[no_consolidated_eqtns].plus_or_minus = new int[nsuppressed];
 
-            consolidated_eqtns[no_consolidated_eqtns].RHS =
-                jjData->consistency_eqtns[i].RHS;
+            consolidated_eqtns[no_consolidated_eqtns].RHS = jjData->consistency_eqtns[i].RHS;
 
             consolidated_index = 0;
 
@@ -211,21 +195,13 @@ Unpicker::consolidate_the_consistency_equations()
                 cell_no = jjData->consistency_eqtns[i].cell_index[j];
 
                 if ((cell_no >= 0) && (cell_no < jjData->ncells)) {
-                    if ((jjData->cells[cell_no].status == 'u') ||
-                        (jjData->cells[cell_no].status == 'm')) {
-                        consolidated_eqtns[no_consolidated_eqtns]
-                            .cell_index[consolidated_index] = cell_no;
-                        consolidated_eqtns[no_consolidated_eqtns]
-                            .plus_or_minus[consolidated_index] =
-                            jjData->consistency_eqtns[i].plus_or_minus[j];
+                    if ((jjData->cells[cell_no].status == 'u') || (jjData->cells[cell_no].status == 'm')) {
+                        consolidated_eqtns[no_consolidated_eqtns].cell_index[consolidated_index] = cell_no;
+                        consolidated_eqtns[no_consolidated_eqtns].plus_or_minus[consolidated_index] = jjData->consistency_eqtns[i].plus_or_minus[j];
                         consolidated_index++;
-                        consolidated_eqtns[no_consolidated_eqtns].size_of_eqtn =
-                            consolidated_index;
+                        consolidated_eqtns[no_consolidated_eqtns].size_of_eqtn = consolidated_index;
                     } else {
-                        consolidated_eqtns[no_consolidated_eqtns].RHS =
-                            consolidated_eqtns[no_consolidated_eqtns].RHS -
-                            (jjData->consistency_eqtns[i].plus_or_minus[j] *
-                             jjData->cells[cell_no].nominal_value);
+                        consolidated_eqtns[no_consolidated_eqtns].RHS = consolidated_eqtns[no_consolidated_eqtns].RHS - (jjData->consistency_eqtns[i].plus_or_minus[j] * jjData->cells[cell_no].nominal_value);
                     }
                 }
             }
@@ -237,9 +213,7 @@ Unpicker::consolidate_the_consistency_equations()
     tidy_up_the_consolidated_equations();
 }
 
-int
-Unpicker::simplify_the_consistency_equations()
-{
+int Unpicker::simplify_the_consistency_equations() {
     int i;
     int j;
     int k;
@@ -256,8 +230,7 @@ Unpicker::simplify_the_consistency_equations()
             case 1:
                 cell_no = consolidated_eqtns[i].cell_index[0];
 
-                if (fabs(cell_bounds[cell_no].upper -
-                         cell_bounds[cell_no].lower) < FLOAT_PRECISION) {
+                if (fabs(cell_bounds[cell_no].upper - cell_bounds[cell_no].lower) < FLOAT_PRECISION) {
                     consolidated_eqtns[i].size_of_eqtn = 0;
                     nos_simplfied++;
                 }
@@ -267,27 +240,18 @@ Unpicker::simplify_the_consistency_equations()
                 for (j = 0; j < consolidated_eqtns[i].size_of_eqtn; j++) {
                     cell_no = consolidated_eqtns[i].cell_index[j];
 
-                    if (fabs(cell_bounds[cell_no].upper -
-                             cell_bounds[cell_no].lower) < FLOAT_PRECISION) {
-                        /* Remove this cell from the equation as it's value is
-                         * known */
+                    if (fabs(cell_bounds[cell_no].upper - cell_bounds[cell_no].lower) < FLOAT_PRECISION) {
+                        /* Remove this cell from the equation as it's value is known */
 
                         if (consolidated_eqtns[i].plus_or_minus[j] == 1) {
-                            consolidated_eqtns[i].RHS =
-                                consolidated_eqtns[i].RHS -
-                                cell_bounds[cell_no].upper;
+                            consolidated_eqtns[i].RHS = consolidated_eqtns[i].RHS - cell_bounds[cell_no].upper;
                         } else {
-                            consolidated_eqtns[i].RHS =
-                                consolidated_eqtns[i].RHS +
-                                cell_bounds[cell_no].upper;
+                            consolidated_eqtns[i].RHS = consolidated_eqtns[i].RHS + cell_bounds[cell_no].upper;
                         }
 
-                        for (k = j + 1; k < consolidated_eqtns[i].size_of_eqtn;
-                             k++) {
-                            consolidated_eqtns[i].cell_index[k - 1] =
-                                consolidated_eqtns[i].cell_index[k];
-                            consolidated_eqtns[i].plus_or_minus[k - 1] =
-                                consolidated_eqtns[i].plus_or_minus[k];
+                        for (k = j + 1; k < consolidated_eqtns[i].size_of_eqtn; k++) {
+                            consolidated_eqtns[i].cell_index[k - 1] = consolidated_eqtns[i].cell_index[k];
+                            consolidated_eqtns[i].plus_or_minus[k - 1] = consolidated_eqtns[i].plus_or_minus[k];
                         }
                         consolidated_eqtns[i].size_of_eqtn--;
                         nos_simplfied++;
@@ -300,9 +264,7 @@ Unpicker::simplify_the_consistency_equations()
     return (nos_simplfied);
 }
 
-bool
-Unpicker::set_initial_lower_and_upper_bounds()
-{
+bool Unpicker::set_initial_lower_and_upper_bounds() {
     bool rc;
     int i;
     int j;
@@ -329,8 +291,7 @@ Unpicker::set_initial_lower_and_upper_bounds()
                 break;
 
             default:
-                /* See if they are all adds... if they are we can get upper
-                 * bounds */
+                /* See if they are all adds... if they are we can get upper bounds */
 
                 no_plus = 0;
 
@@ -350,10 +311,8 @@ Unpicker::set_initial_lower_and_upper_bounds()
                             cell_bounds[cell_no].lower = 0.0;
                         }
 
-                        if (cell_bounds[cell_no].upper >
-                            consolidated_eqtns[i].RHS) {
-                            cell_bounds[cell_no].upper =
-                                consolidated_eqtns[i].RHS;
+                        if (cell_bounds[cell_no].upper > consolidated_eqtns[i].RHS) {
+                            cell_bounds[cell_no].upper = consolidated_eqtns[i].RHS;
                         }
                     }
                 }
@@ -363,9 +322,7 @@ Unpicker::set_initial_lower_and_upper_bounds()
     return rc;
 }
 
-void
-Unpicker::evaluate_exposure()
-{
+void Unpicker::evaluate_exposure() {
     NumberOfPrimaryCells = 0;
     NumberOfSecondaryCells = 0;
     NumberOfPrimaryCells_ValueKnownExactly = 0;
@@ -375,31 +332,24 @@ Unpicker::evaluate_exposure()
         if (jjData->cells[i].status == 'u') {
             NumberOfPrimaryCells++;
 
-            double temp = jjData->cells[i].nominal_value -
-                jjData->cells[i].lower_protection_level;
+            double temp = jjData->cells[i].nominal_value - jjData->cells[i].lower_protection_level;
 
             if (temp < 0.0) {
                 temp = FLOAT_PRECISION;
             }
 
-            if (fabs(cell_bounds[i].upper - cell_bounds[i].lower) <
-                FLOAT_PRECISION) {
-                if (fabs(cell_bounds[i].lower -
-                         jjData->cells[i].nominal_value) < FLOAT_PRECISION) {
+            if (fabs(cell_bounds[i].upper - cell_bounds[i].lower) < FLOAT_PRECISION) {
+                if (fabs(cell_bounds[i].lower - jjData->cells[i].nominal_value) < FLOAT_PRECISION) {
                     NumberOfPrimaryCells_ValueKnownExactly++;
                 } else {
-                    // logger->error(1, "Unpicker inconsistency: cell %d
-                    // calculated to be %lf when true value is %lf", i,
-                    // cell_bounds[i].lower, jjData->cells[i].nominal_value);
+                    logger->error(1, "Unpicker inconsistency: cell %d calculated to be %lf when true value is %lf", i, cell_bounds[i].lower, jjData->cells[i].nominal_value);
                 }
             } else if (cell_bounds[i].lower > temp) {
                 NumberOfPrimaryCells_ValueKnownWithinProtection++;
-            } else if (cell_bounds[i].upper < jjData->cells[i].nominal_value +
-                           jjData->cells[i].upper_protection_level) {
+            } else if (cell_bounds[i].upper < jjData->cells[i].nominal_value + jjData->cells[i].upper_protection_level) {
                 NumberOfPrimaryCells_ValueKnownWithinProtection++;
             } else if (jjData->cells[i].sliding_protection_level > 0) {
-                if ((cell_bounds[i].upper - cell_bounds[i].lower) <
-                    jjData->cells[i].sliding_protection_level) {
+                if ((cell_bounds[i].upper - cell_bounds[i].lower) < jjData->cells[i].sliding_protection_level) {
                     NumberOfPrimaryCells_ValueKnownWithinProtection++;
                 }
             }
@@ -409,25 +359,17 @@ Unpicker::evaluate_exposure()
     }
 }
 
-void
-Unpicker::print_exact_exposure(const char *filename)
-{
+void Unpicker::print_exact_exposure(const char* filename) {
     FILE *ofp;
 
     if ((ofp = fopen(filename, "w")) != NULL) {
         for (CellIndex i = 0; i < jjData->ncells; i++) {
             if (jjData->cells[i].status == 'u') {
-                if (fabs(cell_bounds[i].upper - cell_bounds[i].lower) <
-                    FLOAT_PRECISION) {
-                    if (fabs(cell_bounds[i].lower -
-                             jjData->cells[i].nominal_value) <
-                        FLOAT_PRECISION) {
+                if (fabs(cell_bounds[i].upper - cell_bounds[i].lower) < FLOAT_PRECISION) {
+                    if (fabs(cell_bounds[i].lower - jjData->cells[i].nominal_value) < FLOAT_PRECISION) {
                         fprintf(ofp, "%d\n", i);
                     } else {
-                        // logger->error(1, "Unpicker inconsistency: cell %d
-                        // calculated to be %lf when true value is %lf", i,
-                        // cell_bounds[i].lower,
-                        // jjData->cells[i].nominal_value);
+                        logger->error(1, "Unpicker inconsistency: cell %d calculated to be %lf when true value is %lf", i, cell_bounds[i].lower, jjData->cells[i].nominal_value);
                     }
                 }
             }
@@ -437,9 +379,7 @@ Unpicker::print_exact_exposure(const char *filename)
     }
 }
 
-void
-Unpicker::print_partial_exposure(const char *filename)
-{
+void Unpicker::print_partial_exposure(const char* filename) {
     FILE *ofp;
 
     if ((ofp = fopen(filename, "w")) != NULL) {
@@ -447,8 +387,7 @@ Unpicker::print_partial_exposure(const char *filename)
             if (jjData->cells[i].status == 'u') {
                 bool ValueKnownWithinProtection = false;
 
-                double temp = jjData->cells[i].nominal_value -
-                    jjData->cells[i].lower_protection_level;
+                double temp = jjData->cells[i].nominal_value - jjData->cells[i].lower_protection_level;
 
                 if (temp < 0.0) {
                     temp = FLOAT_PRECISION;
@@ -456,13 +395,10 @@ Unpicker::print_partial_exposure(const char *filename)
 
                 if (cell_bounds[i].lower > temp) {
                     ValueKnownWithinProtection = true;
-                } else if (cell_bounds[i].upper <
-                           jjData->cells[i].nominal_value +
-                               jjData->cells[i].upper_protection_level) {
+                } else if (cell_bounds[i].upper < jjData->cells[i].nominal_value + jjData->cells[i].upper_protection_level) {
                     ValueKnownWithinProtection = true;
                 } else if (jjData->cells[i].sliding_protection_level > 0) {
-                    if ((cell_bounds[i].upper - cell_bounds[i].lower) <
-                        jjData->cells[i].sliding_protection_level) {
+                    if ((cell_bounds[i].upper - cell_bounds[i].lower) < jjData->cells[i].sliding_protection_level) {
                         ValueKnownWithinProtection = true;
                     }
                 }
@@ -477,9 +413,7 @@ Unpicker::print_partial_exposure(const char *filename)
     }
 }
 
-void
-Unpicker::release_processing_eqtns_memory()
-{
+void Unpicker::release_processing_eqtns_memory() {
     int i;
 
     if (processing_eqtns_lower != NULL) {
@@ -531,9 +465,7 @@ Unpicker::release_processing_eqtns_memory()
     }
 }
 
-bool
-Unpicker::improve_lower_and_upper_bounds()
-{
+bool Unpicker::improve_lower_and_upper_bounds() {
     bool rc;
     int i;
     int j;
@@ -603,175 +535,103 @@ Unpicker::improve_lower_and_upper_bounds()
             for (j = 0; j < sz; j++) {
                 // Allocate memory for processing equations
 
-                processing_eqtns_lower[nos_processing_eqtns_lower]
-                    .cells_lower_to_add = new int[sz];
-                processing_eqtns_lower[nos_processing_eqtns_lower]
-                    .cells_lower_to_sub = new int[sz];
-                processing_eqtns_lower[nos_processing_eqtns_lower]
-                    .cells_upper_to_add = new int[sz];
-                processing_eqtns_lower[nos_processing_eqtns_lower]
-                    .cells_upper_to_sub = new int[sz];
+                processing_eqtns_lower[nos_processing_eqtns_lower].cells_lower_to_add = new int[sz];
+                processing_eqtns_lower[nos_processing_eqtns_lower].cells_lower_to_sub = new int[sz];
+                processing_eqtns_lower[nos_processing_eqtns_lower].cells_upper_to_add = new int[sz];
+                processing_eqtns_lower[nos_processing_eqtns_lower].cells_upper_to_sub = new int[sz];
 
-                processing_eqtns_upper[nos_processing_eqtns_upper]
-                    .cells_lower_to_add = new int[sz];
-                processing_eqtns_upper[nos_processing_eqtns_upper]
-                    .cells_lower_to_sub = new int[sz];
-                processing_eqtns_upper[nos_processing_eqtns_upper]
-                    .cells_upper_to_add = new int[sz];
-                processing_eqtns_upper[nos_processing_eqtns_upper]
-                    .cells_upper_to_sub = new int[sz];
+                processing_eqtns_upper[nos_processing_eqtns_upper].cells_lower_to_add = new int[sz];
+                processing_eqtns_upper[nos_processing_eqtns_upper].cells_lower_to_sub = new int[sz];
+                processing_eqtns_upper[nos_processing_eqtns_upper].cells_upper_to_add = new int[sz];
+                processing_eqtns_upper[nos_processing_eqtns_upper].cells_upper_to_sub = new int[sz];
 
                 // Setup processing equations
 
                 dest_cell = consolidated_eqtns[i].cell_index[j];
                 dest_plus_minus = consolidated_eqtns[i].plus_or_minus[j];
 
-                processing_eqtns_lower[nos_processing_eqtns_lower].cellnumber =
-                    dest_cell;
-                processing_eqtns_upper[nos_processing_eqtns_upper].cellnumber =
-                    dest_cell;
+                processing_eqtns_lower[nos_processing_eqtns_lower].cellnumber = dest_cell;
+                processing_eqtns_upper[nos_processing_eqtns_upper].cellnumber = dest_cell;
 
                 if (dest_plus_minus == 1) {
                     // The cell we are looking at is +ve
 
-                    processing_eqtns_lower[nos_processing_eqtns_lower].RHS =
-                        consolidated_RHS;
-                    processing_eqtns_upper[nos_processing_eqtns_upper].RHS =
-                        consolidated_RHS;
+                    processing_eqtns_lower[nos_processing_eqtns_lower].RHS = consolidated_RHS;
+                    processing_eqtns_upper[nos_processing_eqtns_upper].RHS = consolidated_RHS;
 
                     for (k = 0; k < sz; k++) {
                         if (k != j) {
-                            // Get all the other cells in the consolidated
-                            // equation and put them in the right place
+                            // Get all the other cells in the consolidated equation and put them in the right place
 
                             if (consolidated_eqtns[i].plus_or_minus[k] == 1) {
                                 // Set up lower calculation
 
-                                idx = processing_eqtns_lower
-                                          [nos_processing_eqtns_lower]
-                                              .no_upper_subs;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .cells_upper_to_sub[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_lower[nos_processing_eqtns_lower].no_upper_subs;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].cells_upper_to_sub[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .no_upper_subs = idx;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].no_upper_subs = idx;
 
                                 // Set up upper calculation
 
-                                idx = processing_eqtns_upper
-                                          [nos_processing_eqtns_upper]
-                                              .no_lower_subs;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .cells_lower_to_sub[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_upper[nos_processing_eqtns_upper].no_lower_subs;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].cells_lower_to_sub[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .no_lower_subs = idx;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].no_lower_subs = idx;
                             } else {
                                 // Set up lower calculation
 
-                                idx = processing_eqtns_lower
-                                          [nos_processing_eqtns_lower]
-                                              .no_lower_adds;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .cells_lower_to_add[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_lower[nos_processing_eqtns_lower].no_lower_adds;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].cells_lower_to_add[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .no_lower_adds = idx;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].no_lower_adds = idx;
 
                                 // Set up upper calculation
 
-                                idx = processing_eqtns_upper
-                                          [nos_processing_eqtns_upper]
-                                              .no_upper_adds;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .cells_upper_to_add[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_upper[nos_processing_eqtns_upper].no_upper_adds;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].cells_upper_to_add[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .no_upper_adds = idx;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].no_upper_adds = idx;
                             }
                         }
                     }
                 } else {
                     // The cell we are looking at is -ve
 
-                    processing_eqtns_lower[nos_processing_eqtns_lower].RHS =
-                        -consolidated_RHS;
-                    processing_eqtns_upper[nos_processing_eqtns_upper].RHS =
-                        -consolidated_RHS;
+                    processing_eqtns_lower[nos_processing_eqtns_lower].RHS = -consolidated_RHS;
+                    processing_eqtns_upper[nos_processing_eqtns_upper].RHS = -consolidated_RHS;
 
                     for (k = 0; k < sz; k++) {
                         if (k != j) {
-                            // Get all the other cells in the consolidated
-                            // equation and put them in the right place
+                            // Get all the other cells in the consolidated equation and put them in the right place
 
                             if (consolidated_eqtns[i].plus_or_minus[k] == 1) {
                                 // Set up lower calculation
 
-                                idx = processing_eqtns_lower
-                                          [nos_processing_eqtns_lower]
-                                              .no_lower_adds;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .cells_lower_to_add[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_lower[nos_processing_eqtns_lower].no_lower_adds;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].cells_lower_to_add[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .no_lower_adds = idx;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].no_lower_adds = idx;
 
                                 // Set up upper calculation
 
-                                idx = processing_eqtns_upper
-                                          [nos_processing_eqtns_upper]
-                                              .no_upper_adds;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .cells_upper_to_add[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_upper[nos_processing_eqtns_upper].no_upper_adds;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].cells_upper_to_add[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .no_upper_adds = idx;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].no_upper_adds = idx;
                             } else {
                                 // Set up lower calculation
 
-                                idx = processing_eqtns_lower
-                                          [nos_processing_eqtns_lower]
-                                              .no_upper_subs;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .cells_upper_to_sub[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_lower[nos_processing_eqtns_lower].no_upper_subs;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].cells_upper_to_sub[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_lower
-                                    [nos_processing_eqtns_lower]
-                                        .no_upper_subs = idx;
+                                processing_eqtns_lower[nos_processing_eqtns_lower].no_upper_subs = idx;
 
                                 // Set up upper calculation
 
-                                idx = processing_eqtns_upper
-                                          [nos_processing_eqtns_upper]
-                                              .no_lower_subs;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .cells_lower_to_sub[idx] =
-                                    consolidated_eqtns[i].cell_index[k];
+                                idx = processing_eqtns_upper[nos_processing_eqtns_upper].no_lower_subs;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].cells_lower_to_sub[idx] = consolidated_eqtns[i].cell_index[k];
                                 idx++;
-                                processing_eqtns_upper
-                                    [nos_processing_eqtns_upper]
-                                        .no_lower_subs = idx;
+                                processing_eqtns_upper[nos_processing_eqtns_upper].no_lower_subs = idx;
                             }
                         }
                     }
@@ -894,9 +754,7 @@ Unpicker::improve_lower_and_upper_bounds()
     return rc;
 }
 
-void
-Unpicker::Attack()
-{
+void Unpicker::Attack() {
     int iterations;
 
     consolidate_the_consistency_equations();
@@ -916,32 +774,22 @@ Unpicker::Attack()
     evaluate_exposure();
 }
 
-int
-Unpicker::GetNumberOfCells()
-{
+int Unpicker::GetNumberOfCells() {
     return jjData->ncells;
 }
 
-int
-Unpicker::GetNumberOfPrimaryCells()
-{
+int Unpicker::GetNumberOfPrimaryCells() {
     return NumberOfPrimaryCells;
 }
 
-int
-Unpicker::GetNumberOfSecondaryCells()
-{
+int Unpicker::GetNumberOfSecondaryCells() {
     return NumberOfSecondaryCells;
 }
 
-int
-Unpicker::GetNumberOfPrimaryCells_ValueKnownExactly()
-{
+int Unpicker::GetNumberOfPrimaryCells_ValueKnownExactly() {
     return NumberOfPrimaryCells_ValueKnownExactly;
 }
 
-int
-Unpicker::GetNumberOfPrimaryCells_ValueKnownWithinProtection()
-{
+int Unpicker::GetNumberOfPrimaryCells_ValueKnownWithinProtection() {
     return NumberOfPrimaryCells_ValueKnownWithinProtection;
 }

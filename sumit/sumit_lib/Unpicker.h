@@ -1,40 +1,27 @@
 #pragma once
 
+#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include "JJData.h"
 
-class Unpicker
-{
+class Unpicker {
 
-  public:
-    Unpicker(const char *injjfilename);
-
+public:
+    Unpicker(const char* injjfilename);
     ~Unpicker(void);
+    void Attack();
+    int GetNumberOfCells();
+    int GetNumberOfPrimaryCells();
+    int GetNumberOfSecondaryCells();
+    int GetNumberOfPrimaryCells_ValueKnownExactly();
+    int GetNumberOfPrimaryCells_ValueKnownWithinProtection();
+    void print_exact_exposure(const char* filename);
+    void print_partial_exposure(const char* filename);
 
-    void
-    Attack();
-
-    int
-    GetNumberOfCells();
-
-    int
-    GetNumberOfPrimaryCells();
-
-    int
-    GetNumberOfSecondaryCells();
-
-    int
-    GetNumberOfPrimaryCells_ValueKnownExactly();
-
-    int
-    GetNumberOfPrimaryCells_ValueKnownWithinProtection();
-
-    void
-    print_exact_exposure(const char *filename);
-
-    void
-    print_partial_exposure(const char *filename);
-
-  private:
+private:
     struct CellBounds {
         double lower;
         double upper;
@@ -76,24 +63,12 @@ class Unpicker
 
     JJData *jjData;
 
-    void
-    tidy_up_the_consolidated_equations();
+    void tidy_up_the_consolidated_equations();
+    void consolidate_the_consistency_equations();
+    int simplify_the_consistency_equations();
+    bool set_initial_lower_and_upper_bounds();
+    void evaluate_exposure();
+    void release_processing_eqtns_memory();
+    bool improve_lower_and_upper_bounds();
 
-    void
-    consolidate_the_consistency_equations();
-
-    int
-    simplify_the_consistency_equations();
-
-    bool
-    set_initial_lower_and_upper_bounds();
-
-    void
-    evaluate_exposure();
-
-    void
-    release_processing_eqtns_memory();
-
-    bool
-    improve_lower_and_upper_bounds();
 };
