@@ -24,9 +24,10 @@ def run(args: list[str]) -> None:
     # run cell suppression server
     exe_server = "cell_suppression_server.jar"
     dir_server = "sumit_server"
-    command = ["java", "-jar"]
-    command += [os.path.join(path, dir_server, exe_server)]
-    subprocess.run(command, check=True)
+    command = "java -jar "
+    command += os.path.join(path, dir_server, exe_server)
+    command += " &"
+    os.system(command)
 
     # run cell suppression tool
     exe_tool = "cell_suppression_tool"
