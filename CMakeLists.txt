@@ -7,64 +7,35 @@ project(SUMIT CXX)
 set(PROJECT_DESCRIPTION "SUMIT")
 set(PROJECT_VERSION "1.0.0")
 
+# coin-or libaries used by solver
+add_subdirectory(lib)
 
-
+message(INFO " about to try and execute runcoinbrew ")
 # download and install coin-or libraries for solver
-set (COINBREW ${PROJECT_SOURCE_DIR}/lib/coinbrew)
+#set(WD ${PROJECT_SOURCE_DIR}/lib)
+set (WD ${CMAKE_CURRENT_BINARY_DIR})
+set (COINBREW ${WD}/coinbrew)
+set (RUNCOIN_SCRIPT runcoinbrew.sh)
+message(INFO " run command is " ${RUNCOIN})
+message(INFO " coinbrew command is " ${COINBREW})
 ###call coinbrew
 if(MSVC)
   message(FATAL_ERROR "use of coinbrew to install coin-or libaries not suppprted under windows")
 else()
-    set(WD ${PROJECT_SOURCE_DIR}/lib)
-    if( EXISTS ${COINBREW} AND NOT MSVC )
-        #fetch clp
-        execute_process(COMMAND ${COINBREW} fetch Clp --latest-release 
-                        #WORKING_DIRECTORY ${WD}
-                        RESULT_VARIABLE COINBREW_FETCH_CLP)
-        if(NOT COINBREW_FETCH_CLP EQUAL "0")
-            message(FATAL_ERROR "coinbrew failed to fetch Clp" working in ${WD})
-        endif()
-        #fetch osi
-            execute_process(COMMAND ${COINBREW} fetch Osi --latest-release 
-                        #WORKING_DIRECTORY ${WD}
-                        RESULT_VARIABLE COINBREW_FETCH_OSI)
-        if(NOT COINBREW_FETCH_OSI EQUAL "0")
-            message(FATAL_ERROR "coinbrew failed to fetch Osi")
-        endif()
-        #build osi
-            execute_process(COMMAND ${COINBREW} build Osi --verbosity 2 
-                        --parallel-jobs 4 --build-dir build -p dist
-                        --static --tests all --build-dir build
-                        #WORKING_DIRECTORY ${WD}
-                        RESULT_VARIABLE COINBREW_BUILD_OSI)
-        if(NOT COINBREW_BUILD_OSI EQUAL "0")
-            message(FATAL_ERROR "coinbrew failed to build Osi Clp")
-        endif()
-        #build clp
-            execute_process(COMMAND ${COINBREW} build Clp --verbosity 2 
-                    --parallel-jobs 4 --build-dir build -p dist
-                    --static --tests all --build-dir build
-                        #WORKING_DIRECTORY ${WD}
-                        RESULT_VARIABLE COINBREW_BUILD_CLP)
-        if(NOT COINBREW_BUILD_CLP EQUAL "0")
-            message(FATAL_ERROR "coinbrew failed to build Clp")
+    if( EXISTS ${COINBREW} AND EXISTS ${RUNCOIN_SCRIPT} )
+        #fetch Osi, Clp and build
+        execute_process(
+                        COMMAND bash ./runcoinbrew.sh
+                        OUTPUT_FILE ${WD}/coin_log.txt
+                        ERROR_FILE ${WD}/coin_errors.txt
+                        RESULT_VARIABLE RUNCOIN_RES)
+        if(NOT RUNCOIN_RES EQUAL "0")
+            message(FATAL_ERROR "coinbrew failed with message " ${RUNCOIN_RES})
         endif()
     else() 
-      message(FATAL_ERROR "coinbrew not found:\n" ${COINBREW})
+      message(FATAL_ERROR "coinbrew or runcoinbrew.sh not found in :" ${WD})
     endif()
 endif()
-
-
-
-add_subdirectory(lib)
-
-
-
-
-
-
-
-
 
 
 
@@ -121,8 +92,7 @@ add_subdirectory(sumit/sumit_lib)
 add_subdirectory(sumit/cell_suppression_tool)
 target_include_directories(cell_suppression_tool PUBLIC sumit/sumit_lib)
 
-# coin-or libaries used by solver
-add_subdirectory(lib)
+
 
 # suppression solver - executable
 #add_subdirectory(sumit/cell_suppression_solver)
