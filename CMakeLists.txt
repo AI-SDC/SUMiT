@@ -18,14 +18,14 @@ else()
     set(WD ${PROJECT_SOURCE_DIR}/lib)
     if( EXISTS ${COINBREW} AND NOT MSVC )
         #fetch clp
-        execute_process(COMMAND ${COINBREW} fetch Clp --latest-release --no-third-party
+        execute_process(COMMAND ${COINBREW} fetch Clp --latest-release 
                         #WORKING_DIRECTORY ${WD}
                         RESULT_VARIABLE COINBREW_FETCH_CLP)
         if(NOT COINBREW_FETCH_CLP EQUAL "0")
             message(FATAL_ERROR "coinbrew failed to fetch Clp" working in ${WD})
         endif()
         #fetch osi
-            execute_process(COMMAND ${COINBREW} fetch Osi --latest-release --no-third-party
+            execute_process(COMMAND ${COINBREW} fetch Osi --latest-release 
                         #WORKING_DIRECTORY ${WD}
                         RESULT_VARIABLE COINBREW_FETCH_OSI)
         if(NOT COINBREW_FETCH_OSI EQUAL "0")
@@ -33,7 +33,6 @@ else()
         endif()
         #build osi
             execute_process(COMMAND ${COINBREW} build Osi --verbosity 2 
-                        --no-third-party
                         --parallel-jobs 4 --build-dir build -p dist
                         --static --tests all --build-dir build
                         #WORKING_DIRECTORY ${WD}
@@ -43,7 +42,6 @@ else()
         endif()
         #build clp
             execute_process(COMMAND ${COINBREW} build Clp --verbosity 2 
-                    --no-third-party
                     --parallel-jobs 4 --build-dir build -p dist
                     --static --tests all --build-dir build
                         #WORKING_DIRECTORY ${WD}
