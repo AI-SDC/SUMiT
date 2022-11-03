@@ -1,5 +1,5 @@
-#
 # Copyright (C) 2022 Richard Preen <rpreen@gmail.com>
+# Copyright (C) 2022 Jim Smith <james.smith@uwe.ac.uk>
 
 cmake_minimum_required(VERSION 3.12)
 
@@ -7,6 +7,70 @@ project(SUMIT CXX)
 set(PROJECT_DESCRIPTION "SUMIT")
 set(PROJECT_VERSION "1.0.0")
 
+
+
+# download and install coin-or libraries for solver
+set (COINBREW ${PROJECT_SOURCE_DIR}/lib/coinbrew)
+###call coinbrew
+if(MSVC)
+  message(FATAL_ERROR "use of coinbrew to install coin-or libaries not suppprted under windows")
+else()
+    set(WD ${PROJECT_SOURCE_DIR}/lib)
+    if( EXISTS ${COINBREW} AND NOT MSVC )
+        #fetch clp
+        execute_process(COMMAND ${COINBREW} fetch Clp --latest-release --no-third-party
+                        #WORKING_DIRECTORY ${WD}
+                        RESULT_VARIABLE COINBREW_FETCH_CLP)
+        if(NOT COINBREW_FETCH_CLP EQUAL "0")
+            message(FATAL_ERROR "coinbrew failed to fetch Clp" working in ${WD})
+        endif()
+        #fetch osi
+            execute_process(COMMAND ${COINBREW} fetch Osi --latest-release --no-third-party
+                        #WORKING_DIRECTORY ${WD}
+                        RESULT_VARIABLE COINBREW_FETCH_OSI)
+        if(NOT COINBREW_FETCH_OSI EQUAL "0")
+            message(FATAL_ERROR "coinbrew failed to fetch Osi")
+        endif()
+        #build osi
+            execute_process(COMMAND ${COINBREW} build Osi --verbosity 2 
+                        --no-third-party
+                        --parallel-jobs 4 --build-dir build -p dist
+                        --static --tests all --build-dir build
+                        #WORKING_DIRECTORY ${WD}
+                        RESULT_VARIABLE COINBREW_BUILD_OSI)
+        if(NOT COINBREW_BUILD_OSI EQUAL "0")
+            message(FATAL_ERROR "coinbrew failed to build Osi Clp")
+        endif()
+        #build clp
+            execute_process(COMMAND ${COINBREW} build Clp --verbosity 2 
+                    --no-third-party
+                    --parallel-jobs 4 --build-dir build -p dist
+                    --static --tests all --build-dir build
+                        #WORKING_DIRECTORY ${WD}
+                        RESULT_VARIABLE COINBREW_BUILD_CLP)
+        if(NOT COINBREW_BUILD_CLP EQUAL "0")
+            message(FATAL_ERROR "coinbrew failed to build Clp")
+        endif()
+    else() 
+      message(FATAL_ERROR "coinbrew not found:\n" ${COINBREW})
+    endif()
+endif()
+
+
+
+add_subdirectory(lib)
+
+
+
+
+
+
+
+
+
+
+
+#main compilation flags etc.
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -54,13 +118,17 @@ endif()
 # sumit libs
 add_subdirectory(sumit/sumit_lib)
 
+
 # suppression tool - executable
 add_subdirectory(sumit/cell_suppression_tool)
 target_include_directories(cell_suppression_tool PUBLIC sumit/sumit_lib)
 
+# coin-or libaries used by solver
+add_subdirectory(lib)
+
 # suppression solver - executable
-# add_subdirectory(sumit/cell_suppression_solver)
-# target_include_directories(solver PUBLIC sumit/sumit_lib)
+#add_subdirectory(sumit/cell_suppression_solver)
+# target_include_directories(solver PUBLIC sumit/sumit_lib lib/include)
 
 # suppression server - jar
 find_package(Java REQUIRED)
