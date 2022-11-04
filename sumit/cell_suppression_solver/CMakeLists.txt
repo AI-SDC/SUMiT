@@ -9,7 +9,7 @@ set(SOLVER_HEADERS Solver.h)
 # target: cell_suppression_solver - stand-alone binary execution
 # ##############################################################################
 
-set(COIN_LIB "${CMAKE_SOURCE_DIR}/build/dist/lib")
+set(COIN_LIB "${CMAKE_BINARY_DIR}/dist/lib")
 
 find_library(CoinUtils NAMES CoinUtils PATHS ${COIN_LIB} REQUIRED)
 find_library(Osi NAMES Osi PATHS ${COIN_LIB} REQUIRED)

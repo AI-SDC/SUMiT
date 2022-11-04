@@ -80,7 +80,6 @@ class CMakeBuild(build_ext):
         shutil.copy(self.build_temp + path + exe, self.build_lib + path)
 
 
-
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
