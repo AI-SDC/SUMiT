@@ -36,7 +36,8 @@ public:
     int get_number_of_groups();
     void write_cost_file(const char* filename, double* costs, int size);
     void write_jj_file(const char* filename);
-    bool Solver::getCompletedSuccessfully();
+    //bool Solver::getCompletedSuccessfully();
+    bool getCompletedSuccessfully();
 
 private:
     JJData *jjData;

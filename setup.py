@@ -50,23 +50,35 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += ["-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir]
             build_args += ["-j4"]
+
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
         )
+
         self.announce("Building", level=3)
         subprocess.check_call(
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp
         )
+
         self.announce("Copying cell suppression tool", level=3)
         path = "/sumit/cell_suppression_tool/"
         exe = "cell_suppression_tool"
         if platform.system() == "Windows":
             exe += ".exe"
         shutil.copy(self.build_temp + path + exe, self.build_lib + path)
+
         self.announce("Copying cell suppression server", level=3)
         path = "/sumit/sumit_server/"
         exe = "cell_suppression_server.jar"
         shutil.copy(self.build_temp + path + exe, self.build_lib + path)
+
+        self.announce("Copying cell suppression solver", level=3)
+        path = "/sumit/cell_suppression_solver/"
+        exe = "cell_suppression_solver"
+        if platform.system() == "Windows":
+            exe += ".exe"
+        shutil.copy(self.build_temp + path + exe, self.build_lib + path)
+
 
 
 this_directory = Path(__file__).parent

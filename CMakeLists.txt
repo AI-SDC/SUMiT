@@ -3,43 +3,12 @@
 
 cmake_minimum_required(VERSION 3.12)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+
 project(SUMIT CXX)
 set(PROJECT_DESCRIPTION "SUMIT")
 set(PROJECT_VERSION "1.0.0")
 
-# coin-or libaries used by solver
-add_subdirectory(lib)
-
-message(INFO " about to try and execute runcoinbrew ")
-# download and install coin-or libraries for solver
-#set(WD ${PROJECT_SOURCE_DIR}/lib)
-set (WD ${CMAKE_CURRENT_BINARY_DIR})
-set (COINBREW ${WD}/coinbrew)
-set (RUNCOIN_SCRIPT runcoinbrew.sh)
-message(INFO " run command is " ${RUNCOIN})
-message(INFO " coinbrew command is " ${COINBREW})
-###call coinbrew
-if(MSVC)
-  message(FATAL_ERROR "use of coinbrew to install coin-or libaries not suppprted under windows")
-else()
-    if( EXISTS ${COINBREW} AND EXISTS ${RUNCOIN_SCRIPT} )
-        #fetch Osi, Clp and build
-        execute_process(
-                        COMMAND bash ./runcoinbrew.sh
-                        OUTPUT_FILE ${WD}/coin_log.txt
-                        ERROR_FILE ${WD}/coin_errors.txt
-                        RESULT_VARIABLE RUNCOIN_RES)
-        if(NOT RUNCOIN_RES EQUAL "0")
-            message(FATAL_ERROR "coinbrew failed with message " ${RUNCOIN_RES})
-        endif()
-    else() 
-      message(FATAL_ERROR "coinbrew or runcoinbrew.sh not found in :" ${WD})
-    endif()
-endif()
-
-
-
-#main compilation flags etc.
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -87,16 +56,32 @@ endif()
 # sumit libs
 add_subdirectory(sumit/sumit_lib)
 
-
 # suppression tool - executable
 add_subdirectory(sumit/cell_suppression_tool)
 target_include_directories(cell_suppression_tool PUBLIC sumit/sumit_lib)
 
+# coin-or libaries used by solver
+message(INFO " Running coinbrew")
 
+if(WIN32)
+  message(FATAL_ERROR "coinbrew installation not suppprted on windows")
+else()
+  file(GLOB COIN_OR "lib/*")
+  file(COPY ${COIN_OR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(
+    COMMAND bash runcoinbrew.sh
+    OUTPUT_FILE coin_log.txt
+    ERROR_FILE coin_errors.txt
+    RESULT_VARIABLE RUNCOIN_RES)
+  if(NOT RUNCOIN_RES EQUAL "0")
+    message(FATAL_ERROR "coinbrew failed with message " ${RUNCOIN_RES})
+  endif()
+endif()
 
 # suppression solver - executable
-#add_subdirectory(sumit/cell_suppression_solver)
-# target_include_directories(solver PUBLIC sumit/sumit_lib lib/include)
+add_subdirectory(sumit/cell_suppression_solver)
+target_include_directories(cell_suppression_solver
+    PUBLIC sumit/sumit_lib build/dist/include/coin)
 
 # suppression server - jar
 find_package(Java REQUIRED)

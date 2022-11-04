@@ -2,11 +2,11 @@
 
 # Author: Ted Ralphs (ted@lehigh.edu)
 # Copyright 2016-2019, Ted Ralphs
-# Released Under the Eclipse Public License 
+# Released Under the Eclipse Public License
 #
 # TODO
 # - fix dependency-tracking or remove it from configure
-# - Add option to update all current checkouts (like fetch, but no version checks) 
+# - Add option to update all current checkouts (like fetch, but no version checks)
 # - Read config.site
 # - Make it possible to build a series of projects
 # - Provide an option to build Python extensions
@@ -53,29 +53,29 @@ function help {
     echo "             --skip-dependencies don't build dependencies, only main project"
     echo "             --no-third-party don't build third party projects"
     echo "             --off-line build in offline mode (no network access)"
-    echo "             --static build static executables on Linux and OS X" 
+    echo "             --static build static executables on Linux and OS X"
     echo "             --download-binary <'proj1 proj2'> list of binary packages to download"
     echo "             --platform <string> string specifying platform (required for binaries)"
     echo
     echo "  install: Install all projects in location specified by prefix. This is done"
-    echo "           done automatically after build, so probably not useful in general." 
+    echo "           done automatically after build, so probably not useful in general."
     echo
     echo "  uninstall: Uninstall all projects"
     echo
     echo "  download: Download project binaries (experimental, limited projects supported)"
     echo "    options: --platform <string> string specifying platform (required for binaries)"
     echo "             --prefix,-p </dir/to/install> where to install (default: $PWD/dist)"
-    echo 
+    echo
     echo "General options:"
     echo "  --debug,-d Turn on debugging output (this should be the first option specified)"
     echo "  --no-prompt,-n Suppress interactive prompts"
     echo "  --help,-h Print help"
-    echo 
+    echo
 
 }
 
 ###################################################################################
-# Helpers to switch directories 
+# Helpers to switch directories
 ###################################################################################
 
 function pushd_ {
@@ -91,7 +91,7 @@ function popd_ {
 }
 
 ###################################################################################
-# Helper to print status messages 
+# Helper to print status messages
 ###################################################################################
 
 function print_action {
@@ -143,7 +143,7 @@ function parse_args {
                         [\\/$]* | ?:[\\/]* | NONE | '' )
                             prefix=$option_arg
                             ;;
-                        *)  
+                        *)
                             prefix=$PWD/$option_arg
                             ;;
                     esac
@@ -234,7 +234,7 @@ function parse_args {
                 if [ $legacy_format = false ]; then
                     shift
                 fi
-                ;;                
+                ;;
             -s|--skip)
                 if [ x"$option_arg" != x ]; then
                     coin_skip_projects=$option_arg
@@ -489,7 +489,7 @@ create_variables() {
 ###################################################################################
 
 function find_skip_projects {
-    
+
     for c in ${!configure_options[@]} ; do
     if [[ $c == --without-* ]]; then
         found_project=true
@@ -672,7 +672,7 @@ function should_fetch {
     if [ -d $dir ] && ([ $skip_update = true ] || [ $fetch != true ]); then
         return 1
     fi
-       
+
     TMP_IFS=$IFS
     unset IFS
     for i in $coin_skip_projects
@@ -822,7 +822,7 @@ function prompt_for_action {
                     ;;
             esac
             ;;
-        3) 
+        3)
             install=true
             echo "Please specify an install directory (can be relative or absolute)."
             echo -n "=> "
@@ -845,7 +845,7 @@ function prompt_for_main {
     # Prompt user to pick a main project or return error
     echo
     echo "Please choose a main project to fetch/build by typing 1-18"
-    echo "or simply type the repository name of another project not" 
+    echo "or simply type the repository name of another project not"
     echo "listed here."
     echo " 1. Osi"
     echo " 2. Clp"
@@ -932,7 +932,7 @@ function prompt_for_fetch {
 }
 
 ###################################################################################
-# Ask user what verion to install
+# Ask user what version to install
 ###################################################################################
 
 function prompt_for_version {
@@ -976,7 +976,7 @@ function prompt_for_version {
 ###################################################################################
 
 function prompt_for_rebuild {
-    
+
     echo "Please choose one of the following options."
     echo " The indicated action will be performed for you AUTOMATICALLY"
     echo "1. Run the build again with the previously specified options."
@@ -1101,7 +1101,7 @@ function parse_dependencies_file {
                 if [[ ${Dependencies__URL[count]} != *github* ]]; then
                     continue
                 fi
-                
+
                 if [ $ssh_checkout = true ]; then
                     urls+=( $(echo ${Dependencies__URL[count]} |
                                   sed 's|https://github.com/|git@github.com:|') )
@@ -1109,7 +1109,7 @@ function parse_dependencies_file {
                     urls+=( ${Dependencies__URL[count]} )
                 fi
                 pdirs+=( $(echo ${Dependencies__URL[count]} | cut -d '/' -f 5 |
-                               sed 's|-|/|') ) 
+                               sed 's|-|/|') )
                 projs+=( $(echo ${pdirs[count]} | cut -d '/' -f 2) )
                 version_nums+=( ${Dependencies__Version[count]} )
                 case $(echo ${version_nums[count]} | tr -cd '.' | wc -c | tr -d ' ') in
@@ -1158,7 +1158,7 @@ function fetch_proj {
         if [ $get_latest_release = "true" ] && [[ $version != releases/* ]]; then
             if [[ $version != stable/* ]]; then
                 echo "Warning: Dependency is not a stable version, will not be converted to release"
-            else 
+            else
                 tmp=$(git tag --list "${version/stable/releases}*" \
                           | sort -V | tail -1)
                 if [ x$tmp != x ]; then
@@ -1227,7 +1227,7 @@ function fetch_proj {
         fi
         new_rev=$(git rev-parse HEAD)
     else
-        if [ $get_latest_release = "true" ] && [[ $version != releases/* ]]; then 
+        if [ $get_latest_release = "true" ] && [[ $version != releases/* ]]; then
             latest_release=$(git ls-remote --tags $url)
             if echo "$latest_release" | fgrep releases &> /dev/null ; then
                 tmp=$(echo "$latest_release" | fgrep releases | \
@@ -1264,7 +1264,7 @@ function fetch_proj {
                 popd_
             fi
             pushd_ $dir
-        fi     
+        fi
         new_rev=$(git rev-parse HEAD)
     fi
     popd_
@@ -1282,10 +1282,10 @@ function fetch_proj {
         else
             echo "Not downloading source for $tp_proj..."
         fi
-    fi  
+    fi
 
 }
-        
+
 ###################################################################################
 # Wrapper for invoking make with different verbosities
 ###################################################################################
@@ -1327,7 +1327,7 @@ function build_proj {
     mkdir -p $build_dir/$dir/$version_num
     echo -n $dir/$version_num" " >> $build_dir/coin_subdirs.txt
     pushd_ $build_dir/$dir/$version_num
-    
+
     if [ ! -e config.status ] || [ $reconfigure = "true" ]; then
         if [ $reconfigure = "true" ]; then
             print_action "Reconfiguring $dir $version_num"
@@ -1361,7 +1361,7 @@ function build_proj {
                 if [ "$(command -v pkg-config)" = "" ] &&
                        [ "$(command -v pkgconf)" = "" ]; then
                     msg "${RED}No pkg-config or pkgconf were found on your system"
-                    msg "If packages were not found during configuration," 
+                    msg "If packages were not found during configuration,"
                     msg "this could be the reason."
                     msg "Installation is highly recommended."
                     msg "See https://coin-or.github.io for details${NOFORMAT}"
@@ -1475,7 +1475,7 @@ function uninstall_proj {
 ###################################################################################
 
 function download_binaries {
-    
+
     pushd_ $prefix
     if [ x"$download_projs" = x ]; then
         download_projs=${main_proj}@${version_num}
@@ -1604,12 +1604,12 @@ die() {
 ###########################################################################
 
 echo "Welcome to the COIN-OR fetch and build utility, version 2"
-echo 
+echo
 echo "To use the legacy version of coinbrew, '$ wget https://raw.githubusercontent.com/coin-or/coinbrew/v1.0/coinbrew'"
 echo "For help, run script with --help or see https://coin-or.github.io/coinbrew"
 echo "Please report issues at https://github.com/coin-or/coinbrew"
 echo "Detailed build documentation at https://coin-or.github.io"
-echo 
+echo
 
 ###################################################################################
 # Check bash version, existence of pkg-config,  and set variables
@@ -1624,7 +1624,7 @@ fi
 
 if [ "$(command -v pkg-config)" = "" ] && [ "$(command -v pkgconf)" = "" ]; then
     msg "${RED}No pkg-config or pkgconf found on system"
-    msg "If packages are not found during configuration," 
+    msg "If packages are not found during configuration,"
     msg "this could be the reason. Installation is highly recommended."
     msg "See https://coin-or.github.io for details"
     msg "${NOFORMAT}"
@@ -1719,14 +1719,14 @@ if [ $build = "true" ] || [ $install = "true" ] || [ $uninstall = "true" ]; then
             build_dir=$root_dir/build-debug
         fi
     fi
-    
+
     #Try to create the build directory if it doesn't exist
     if [ ! -d $build_dir ]; then
         set +e
         mkdir -p $build_dir 2> /dev/null
         set -e
     fi
-    
+
     #Check whether build directory creation was successful
     if [ ! -d $build_dir ]; then
         msg "Error: ${RED}Build directory cannot be created."
@@ -1861,7 +1861,7 @@ fi
 if [ $get_latest_release = "true" ] ; then
     if [ -n "$latest_release" ] ; then
         if [[ "$main_proj_version" != releases/* ]]; then
-            echo 
+            echo
             if [ "$main_proj_version" != "" ]; then
                 echo "Fetching latest release $latest_release rather than specified version $main_proj_version."
             else
@@ -1921,7 +1921,7 @@ if [ -d $main_proj_dir ]; then
             echo "################################################"
             echo "### Building version $main_proj_version"
             echo "### with existing versions of dependencies."
-            echo "### Ctrl-c and run 'fetch' to switch versions" 
+            echo "### Ctrl-c and run 'fetch' to switch versions"
             echo "### or to ensure correct dependencies"
             echo "################################################"
             echo
@@ -1952,7 +1952,7 @@ else
        fi
     fi
 fi
-    
+
 ###################################################################################
 # This changes the default separator used in for loops to carriage return.
 # We need this later.
@@ -1988,7 +1988,7 @@ if [ $build = "true" ]; then
             if [ $no_prompt = false ]; then
                 prompt_for_rebuild
             else
-                echo "Options specifed on command line being ignored."
+                echo "Options specified on command line being ignored."
                 echo "  - If you wish to use new options in the same build"
                 echo "    directory, re-run with --reconfigure"
                 echo "  - If you wish to build in a new directory,"
@@ -2020,7 +2020,7 @@ if [ $build = "true" ]; then
 fi
 
 ###################################################################################
-# Set the install directory. 
+# Set the install directory.
 ###################################################################################
 
 if [ $build = "true" ] || [ $download = "true" ]; then
@@ -2077,10 +2077,10 @@ if [ "$main_proj" != "" ]; then
     proj=$main_proj
     version=$main_proj_version
     required=Required
-    
+
     sha=$main_proj_sha
     if should_fetch; then
-        fetch_proj 
+        fetch_proj
     elif [ $fetch = "true" ]; then
         print_action "Skipping update of $dir"
     fi
@@ -2157,7 +2157,7 @@ if [ $write_yaml = true ]; then
     yaml_file=$main_proj_dir/.coin-or/config.yml
     xml_file=$main_proj_dir/.coin-or/projDesc.xml
     echo "Description:" > $yaml_file
-    echo "  Slug: $main_proj" >> $yaml_file 
+    echo "  Slug: $main_proj" >> $yaml_file
     echo "  ShortName: $main_proj" >> $yaml_file
     echo "  LongName:" >> $yaml_file
     echo -n "  ShortDescription: " >> $yaml_file
@@ -2205,7 +2205,7 @@ do
             dir=Blis
             ;;
     esac
-    
+
     if [ $write_yaml = true ] && [ $dir != $main_proj_dir ]; then
         tmp=$(echo $url | sed "s|https://github.com/||" | sed "s|git@github.com:||" | \
                   cut -d "/" -f 2)
@@ -2243,7 +2243,7 @@ do
             fi
             fetch_proj
         elif [ $fetch = true ]; then
-            if [ -d $dir ]; then 
+            if [ -d $dir ]; then
                 print_action "Skipping update of $dir"
             else
                 print_action "Skipping $dir"
@@ -2277,7 +2277,7 @@ do
                 deps+="    Required: Required"$'\n'
                 ;;
         esac
-        
+
     fi
 
     #Now set the version number according to the version we currently have checked out
@@ -2401,4 +2401,3 @@ fi
 
 
 IFS=$TMP_IFS
-
