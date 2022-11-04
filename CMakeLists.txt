@@ -81,7 +81,7 @@ endif()
 # suppression solver - executable
 add_subdirectory(sumit/cell_suppression_solver)
 target_include_directories(cell_suppression_solver
-    PUBLIC sumit/sumit_lib build/dist/include/coin)
+    PUBLIC sumit/sumit_lib ${CMAKE_BINARY_DIR}/dist/include/coin)
 
 # suppression server - jar
 find_package(Java REQUIRED)
